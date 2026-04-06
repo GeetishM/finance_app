@@ -1,4 +1,10 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
 part of 'goal.dart';
+
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
 
 class SavingsGoalAdapter extends TypeAdapter<SavingsGoal> {
   @override
@@ -7,19 +13,17 @@ class SavingsGoalAdapter extends TypeAdapter<SavingsGoal> {
   @override
   SavingsGoal read(BinaryReader reader) {
     final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{};
-    for (var i = 0; i < numOfFields; i++) {
-      final fieldId = reader.readByte();
-      fields[fieldId] = reader.read();
-    }
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
     return SavingsGoal(
-      id: fields[0] as String,
+      id: fields[0] as String?,
       title: fields[1] as String,
       targetAmount: fields[2] as double,
       currentAmount: fields[3] as double,
       deadline: fields[4] as DateTime,
       description: fields[5] as String?,
-      createdAt: fields[6] as DateTime,
+      createdAt: fields[6] as DateTime?,
       isCompleted: fields[7] as bool,
     );
   }
@@ -45,4 +49,14 @@ class SavingsGoalAdapter extends TypeAdapter<SavingsGoal> {
       ..writeByte(7)
       ..write(obj.isCompleted);
   }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SavingsGoalAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }

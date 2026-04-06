@@ -1,4 +1,10 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
 part of 'transaction.dart';
+
+// **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
 
 class TransactionAdapter extends TypeAdapter<Transaction> {
   @override
@@ -7,19 +13,17 @@ class TransactionAdapter extends TypeAdapter<Transaction> {
   @override
   Transaction read(BinaryReader reader) {
     final numOfFields = reader.readByte();
-    final fields = <int, dynamic>{};
-    for (var i = 0; i < numOfFields; i++) {
-      final fieldId = reader.readByte();
-      fields[fieldId] = reader.read();
-    }
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
     return Transaction(
-      id: fields[0] as String,
+      id: fields[0] as String?,
       amount: fields[1] as double,
       type: fields[2] as TransactionType,
       category: fields[3] as TransactionCategory,
       date: fields[4] as DateTime,
       description: fields[5] as String?,
-      createdAt: fields[6] as DateTime,
+      createdAt: fields[6] as DateTime?,
     );
   }
 
@@ -42,34 +46,14 @@ class TransactionAdapter extends TypeAdapter<Transaction> {
       ..writeByte(6)
       ..write(obj.createdAt);
   }
-}
-
-class TransactionTypeAdapter extends TypeAdapter<TransactionType> {
-  @override
-  final typeId = 10;
 
   @override
-  TransactionType read(BinaryReader reader) {
-    return TransactionType.values[reader.readByte()];
-  }
+  int get hashCode => typeId.hashCode;
 
   @override
-  void write(BinaryWriter writer, TransactionType obj) {
-    writer.writeByte(obj.index);
-  }
-}
-
-class TransactionCategoryAdapter extends TypeAdapter<TransactionCategory> {
-  @override
-  final typeId = 11;
-
-  @override
-  TransactionCategory read(BinaryReader reader) {
-    return TransactionCategory.values[reader.readByte()];
-  }
-
-  @override
-  void write(BinaryWriter writer, TransactionCategory obj) {
-    writer.writeByte(obj.index);
-  }
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TransactionAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
 }
