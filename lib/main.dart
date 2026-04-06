@@ -1,4 +1,5 @@
 import 'package:finance_app/providers/goal_provider.dart';
+import 'package:finance_app/providers/localization_provider.dart';
 import 'package:finance_app/providers/theme_provider.dart';
 import 'package:finance_app/providers/transaction_provider.dart';
 import 'package:finance_app/screens/goals_screen.dart';
@@ -6,6 +7,7 @@ import 'package:finance_app/screens/home_screen.dart';
 import 'package:finance_app/screens/insights_screen.dart';
 import 'package:finance_app/screens/transactions_screen.dart';
 import 'package:finance_app/services/database_service.dart';
+import 'package:finance_app/services/notification_service.dart';
 import 'package:finance_app/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +15,15 @@ import 'package:provider/provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DatabaseService.initializeDatabase();
+
+  // 🛠️ Initialize Notifications
+  final notify = NotificationService();
+  await notify.init();
+  
+  // Set default schedule on first boot
+  final time = DatabaseService.getReminderTime();
+  await notify.scheduleDailyReminder(time['hour']!, time['minute']!);
+  
   runApp(const MyApp());
 }
 
@@ -26,6 +37,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => TransactionProvider()),
         ChangeNotifierProvider(create: (_) => GoalProvider()),
+        ChangeNotifierProvider(create: (_) => LocalizationProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {

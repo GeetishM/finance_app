@@ -7,8 +7,25 @@ class DatabaseService {
   static const String goalsBox = 'goals';
   static const String settingsBox = 'settings';
 
-  static const String themeKey =
-      'isDarkMode'; // 🛠️ ADDED: Key for our theme setting
+  static const String reminderHourKey = 'reminderHour';
+  static const String reminderMinuteKey = 'reminderMinute';
+
+  static const String themeKey = 'isDarkMode'; // 🛠️ ADDED: Key for our theme setting
+  static const String languageKey = 'appLanguage'; // 🛠️ ADDED: Key for language setting
+
+  static Future<void> saveReminderTime(int hour, int minute) async {
+    final box = Hive.box(settingsBox);
+    await box.put(reminderHourKey, hour);
+    await box.put(reminderMinuteKey, minute);
+  }
+
+  static Map<String, int> getReminderTime() {
+    final box = Hive.box(settingsBox);
+    return {
+      'hour': box.get(reminderHourKey, defaultValue: 20), // 8 PM default
+      'minute': box.get(reminderMinuteKey, defaultValue: 0),
+    };
+  }
 
   static Future<void> initializeDatabase() async {
     await Hive.initFlutter();
@@ -44,6 +61,17 @@ class DatabaseService {
     return box.get(
       themeKey,
     ); // Returns null if the user hasn't opened the app before
+  }
+
+  // --- Language Settings Operations 🛠️ ADDED ---
+  static Future<void> saveLanguage(String language) async {
+    final box = Hive.box(settingsBox);
+    await box.put(languageKey, language);
+  }
+
+  static String? getLanguage() {
+    final box = Hive.box(settingsBox);
+    return box.get(languageKey); 
   }
   // ------------------------------------------------------
 
