@@ -2,11 +2,13 @@ import 'package:finance_app/models/goal.dart';
 import 'package:finance_app/models/transaction.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-
 class DatabaseService {
   static const String transactionsBox = 'transactions';
   static const String goalsBox = 'goals';
   static const String settingsBox = 'settings';
+
+  static const String themeKey =
+      'isDarkMode'; // 🛠️ ADDED: Key for our theme setting
 
   static Future<void> initializeDatabase() async {
     await Hive.initFlutter();
@@ -18,21 +20,32 @@ class DatabaseService {
     if (!Hive.isAdapterRegistered(1)) {
       Hive.registerAdapter(SavingsGoalAdapter());
     }
-    
-    // --- ADD THESE TWO NEW ADAPTERS ---
     if (!Hive.isAdapterRegistered(2)) {
       Hive.registerAdapter(TransactionTypeAdapter());
     }
     if (!Hive.isAdapterRegistered(3)) {
       Hive.registerAdapter(TransactionCategoryAdapter());
     }
-    // ----------------------------------
 
     // Open boxes
     await Hive.openBox<Transaction>(transactionsBox);
     await Hive.openBox<SavingsGoal>(goalsBox);
-    await Hive.openBox(settingsBox);
+    await Hive.openBox(settingsBox); // Settings box is ready to use!
   }
+
+  // --- Theme Settings Operations 🛠️ ADDED THIS SECTION ---
+  static Future<void> saveTheme(bool isDark) async {
+    final box = Hive.box(settingsBox);
+    await box.put(themeKey, isDark);
+  }
+
+  static bool? getTheme() {
+    final box = Hive.box(settingsBox);
+    return box.get(
+      themeKey,
+    ); // Returns null if the user hasn't opened the app before
+  }
+  // ------------------------------------------------------
 
   // Transaction Operations
   static Future<void> addTransaction(Transaction transaction) async {
@@ -52,36 +65,23 @@ class DatabaseService {
 
   static List<Transaction> getAllTransactions() {
     final box = Hive.box<Transaction>(transactionsBox);
-    return box.values.toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
+    final transactions = box.values.toList();
+    transactions.sort((a, b) => b.date.compareTo(a.date));
+    return transactions;
   }
 
   static List<Transaction> getTransactionsByDateRange(
-    DateTime startDate,
-    DateTime endDate,
+    DateTime start,
+    DateTime end,
   ) {
     final transactions = getAllTransactions();
     return transactions.where((t) {
-      final date = DateTime(t.date.year, t.date.month, t.date.day);
-      final start = DateTime(startDate.year, startDate.month, startDate.day);
-      final end = DateTime(endDate.year, endDate.month, endDate.day);
-      return !date.isBefore(start) && !date.isAfter(end);
+      final tDate = DateTime(t.date.year, t.date.month, t.date.day);
+      final sDate = DateTime(start.year, start.month, start.day);
+      final eDate = DateTime(end.year, end.month, end.day);
+      return (tDate.isAtSameMomentAs(sDate) || tDate.isAfter(sDate)) &&
+          (tDate.isAtSameMomentAs(eDate) || tDate.isBefore(eDate));
     }).toList();
-  }
-
-  static List<Transaction> getTransactionsByCategory(
-    TransactionCategory category,
-  ) {
-    final transactions = getAllTransactions();
-    return transactions.where((t) => t.category == category).toList();
-  }
-
-  static List<Transaction> searchTransactions(String query) {
-    final transactions = getAllTransactions();
-    return transactions
-        .where((t) =>
-            t.description?.toLowerCase().contains(query.toLowerCase()) ?? false)
-        .toList();
   }
 
   // Goal Operations
@@ -102,15 +102,10 @@ class DatabaseService {
 
   static List<SavingsGoal> getAllGoals() {
     final box = Hive.box<SavingsGoal>(goalsBox);
-    return box.values.toList()
-      ..sort((a, b) => a.deadline.compareTo(b.deadline));
+    return box.values.toList();
   }
 
-  static List<SavingsGoal> getActiveGoals() {
-    return getAllGoals().where((g) => !g.isCompleted).toList();
-  }
-
-  // Analytics
+  // Helper Methods
   static double getTotalIncome([DateTime? fromDate, DateTime? toDate]) {
     final transactions = fromDate != null && toDate != null
         ? getTransactionsByDateRange(fromDate, toDate)
@@ -146,8 +141,10 @@ class DatabaseService {
     return balance;
   }
 
-  static Map<TransactionCategory, double> getExpensesByCategory(
-      [DateTime? fromDate, DateTime? toDate]) {
+  static Map<TransactionCategory, double> getExpensesByCategory([
+    DateTime? fromDate,
+    DateTime? toDate,
+  ]) {
     final transactions = fromDate != null && toDate != null
         ? getTransactionsByDateRange(fromDate, toDate)
         : getAllTransactions();
@@ -164,10 +161,5 @@ class DatabaseService {
     }
 
     return categoryMap;
-  }
-
-  static void clearAllData() {
-    Hive.box<Transaction>(transactionsBox).clear();
-    Hive.box<SavingsGoal>(goalsBox).clear();
   }
 }

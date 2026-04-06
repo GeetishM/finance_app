@@ -1,17 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart'; // 🛠️ ADDED: To check system theme
 import 'package:google_fonts/google_fonts.dart';
+import 'package:finance_app/services/database_service.dart'; // 🛠️ ADDED: To save/load preference
 
 class ThemeProvider extends ChangeNotifier {
   bool _isDarkMode = false;
   bool get isDarkMode => _isDarkMode;
 
+  // 🛠️ ADDED: Constructor to load theme instantly when app starts
+  ThemeProvider() {
+    _loadThemePreference();
+  }
+
+  // 🛠️ ADDED: Logic to check Hive or System Default
+  void _loadThemePreference() {
+    final savedTheme = DatabaseService.getTheme();
+
+    if (savedTheme != null) {
+      // If user has opened the app before, use their saved preference
+      _isDarkMode = savedTheme;
+    } else {
+      // If first time, check the system brightness (iOS/Android settings)
+      var brightness =
+          SchedulerBinding.instance.platformDispatcher.platformBrightness;
+      _isDarkMode = brightness == Brightness.dark;
+      // Save this initial system preference so we remember it
+      DatabaseService.saveTheme(_isDarkMode);
+    }
+    notifyListeners();
+  }
+
   void toggleTheme() {
     _isDarkMode = !_isDarkMode;
+    DatabaseService.saveTheme(_isDarkMode); // 🛠️ Save choice on toggle
     notifyListeners();
   }
 
   void setTheme(bool isDark) {
     _isDarkMode = isDark;
+    DatabaseService.saveTheme(_isDarkMode); // 🛠️ Save choice on set
     notifyListeners();
   }
 
@@ -52,7 +79,10 @@ class ThemeProvider extends ChangeNotifier {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none, // Remove harsh borders
@@ -107,14 +137,15 @@ class ThemeProvider extends ChangeNotifier {
         elevation: 12,
         shadowColor: Colors.black.withOpacity(0.4),
         color: const Color(0xFF1E293B), // Slate surface
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: const Color(0xFF1E293B),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
