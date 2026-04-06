@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-
 class AddTransactionScreen extends StatefulWidget {
   final Transaction? transaction;
 
@@ -26,10 +25,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   void initState() {
     super.initState();
     if (widget.transaction != null) {
-      _amountController =
-          TextEditingController(text: widget.transaction!.amount.toString());
-      _descriptionController =
-          TextEditingController(text: widget.transaction!.description);
+      _amountController = TextEditingController(text: widget.transaction!.amount.toString());
+      _descriptionController = TextEditingController(text: widget.transaction!.description);
       _transactionType = widget.transaction!.type;
       _selectedCategory = widget.transaction!.category;
       _selectedDate = widget.transaction!.date;
@@ -54,81 +51,75 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.transaction != null
-              ? 'Edit Transaction'
-              : 'Add Transaction',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          widget.transaction != null ? 'Edit Transaction' : 'New Entry',
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
         ),
-        elevation: 0,
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Transaction Type
-              _buildSectionTitle(context, 'Transaction Type'),
-              const SizedBox(height: 12),
-              _buildTypeSelector(),
-              const SizedBox(height: 24),
-
-              // Amount
-              _buildSectionTitle(context, 'Amount'),
-              const SizedBox(height: 12),
-              TextField(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTypeSelector(),
+            const SizedBox(height: 32),
+            
+            // Massive Amount Input
+            Center(
+              child: TextField(
                 controller: _amountController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: _transactionType == TransactionType.income ? AppConstants.successColor : AppConstants.errorColor,
+                ),
                 decoration: InputDecoration(
                   hintText: '0.00',
+                  hintStyle: TextStyle(color: Colors.grey[300]),
                   prefixText: '₹ ',
-                  prefixStyle: Theme.of(context).textTheme.headlineSmall,
+                  prefixStyle: Theme.of(context).textTheme.displayMedium?.copyWith(color: Colors.grey[400]),
+                  filled: false,
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
                 ),
               ),
-              const SizedBox(height: 24),
+            ),
+            const SizedBox(height: 40),
 
-              // Category
-              _buildSectionTitle(context, 'Category'),
-              const SizedBox(height: 12),
-              _buildCategoryGrid(),
-              const SizedBox(height: 24),
+            _buildSectionTitle(context, 'Category'),
+            const SizedBox(height: 16),
+            _buildCategoryGrid(),
+            const SizedBox(height: 32),
 
-              // Date
-              _buildSectionTitle(context, 'Date'),
-              const SizedBox(height: 12),
-              _buildDatePicker(),
-              const SizedBox(height: 24),
+            _buildSectionTitle(context, 'Date'),
+            const SizedBox(height: 12),
+            _buildDatePicker(),
+            const SizedBox(height: 32),
 
-              // Description
-              _buildSectionTitle(context, 'Description (Optional)'),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _descriptionController,
-                decoration: InputDecoration(
-                  hintText: 'Add a note...',
-                  hintMaxLines: 3,
+            _buildSectionTitle(context, 'Description (Optional)'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                hintText: 'What was this for?',
+              ),
+            ),
+            const SizedBox(height: 40),
+
+            SizedBox(
+              width: double.infinity,
+              height: 56, // Taller, more premium button
+              child: ElevatedButton(
+                onPressed: _saveTransaction,
+                child: Text(
+                  widget.transaction != null ? 'Update' : 'Save Entry',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(height: 32),
-
-              // Save Button
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _saveTransaction,
-                  child: Text(
-                    widget.transaction != null ? 'Update' : 'Add',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+            ),
+            const SizedBox(height: 32),
+          ],
         ),
       ),
     );
@@ -137,76 +128,62 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   Widget _buildSectionTitle(BuildContext context, String title) {
     return Text(
       title,
-      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+      style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800, color: Colors.grey[500]),
     );
   }
 
   Widget _buildTypeSelector() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildTypeButton(
-            'Income',
-            TransactionType.income,
-            AppConstants.successColor,
-            Icons.trending_up,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildTypeButton(
-            'Expense',
-            TransactionType.expense,
-            AppConstants.errorColor,
-            Icons.trending_down,
-          ),
-        ),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.grey[200],
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          // Passed the requested icons here!
+          Expanded(child: _buildTypeButton('Expense', TransactionType.expense, AppConstants.errorColor, Icons.trending_down_rounded)),
+          Expanded(child: _buildTypeButton('Income', TransactionType.income, AppConstants.successColor, Icons.trending_up_rounded)),
+        ],
+      ),
     );
   }
 
-  Widget _buildTypeButton(
-    String label,
-    TransactionType type,
-    Color color,
-    IconData icon,
-  ) {
+  Widget _buildTypeButton(String label, TransactionType type, Color activeColor, IconData icon) {
     final isSelected = _transactionType == type;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
       onTap: () {
         setState(() {
           _transactionType = type;
-          // Reset category based on type
-          if (type == TransactionType.income) {
-            _selectedCategory = TransactionCategory.salary;
-          } else {
-            _selectedCategory = TransactionCategory.food;
-          }
+          _selectedCategory = type == TransactionType.income ? TransactionCategory.salary : TransactionCategory.food;
         });
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.2) : Colors.transparent,
-          border: Border.all(
-            color: isSelected ? color : Colors.grey[300]!,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(12),
+          color: isSelected ? (isDark ? const Color(0xFF334155) : Colors.white) : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: isSelected && !isDark ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))] : [],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color),
+            Icon(
+              icon,
+              color: isSelected ? activeColor : Colors.grey[500],
+              size: 20,
+            ),
             const SizedBox(width: 8),
             Text(
               label,
+              textAlign: TextAlign.center,
               style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.w600,
+                color: isSelected ? activeColor : Colors.grey[500],
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                fontSize: 16,
               ),
             ),
           ],
@@ -217,69 +194,47 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   Widget _buildCategoryGrid() {
     final categories = _transactionType == TransactionType.income
-        ? [
-            TransactionCategory.salary,
-            TransactionCategory.freelance,
-            TransactionCategory.bonus,
-            TransactionCategory.other,
-          ]
-        : TransactionCategory.values
-            .where((c) => c != TransactionCategory.salary &&
-                c != TransactionCategory.freelance &&
-                c != TransactionCategory.bonus)
-            .toList();
+        ? [TransactionCategory.salary, TransactionCategory.freelance, TransactionCategory.bonus, TransactionCategory.other]
+        : TransactionCategory.values.where((c) => c != TransactionCategory.salary && c != TransactionCategory.freelance && c != TransactionCategory.bonus).toList();
 
-    return GridView.count(
-      crossAxisCount: 4,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 1.0,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      children: categories
-          .map((category) => _buildCategoryButton(category))
-          .toList(),
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      children: categories.map((category) => _buildCategoryBubble(category)).toList(),
     );
   }
 
-  Widget _buildCategoryButton(TransactionCategory category) {
+  Widget _buildCategoryBubble(TransactionCategory category) {
     final isSelected = _selectedCategory == category;
     final color = getCategoryColor(category);
-    final icon = getCategoryIcon(category);
-    final label = getCategoryLabel(category);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedCategory = category;
-        });
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: isSelected
-              ? color.withOpacity(0.2)
-              : Colors.grey[200],
-          border: Border.all(
-            color: isSelected ? color : Colors.transparent,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
+      onTap: () => setState(() => _selectedCategory = category),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 75,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              color: color,
-              size: 28,
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isSelected ? color : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                shape: BoxShape.circle,
+                border: Border.all(color: isSelected ? color : (isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!), width: 1.5),
+                boxShadow: [
+                  if (isSelected) BoxShadow(color: color.withOpacity(0.4), blurRadius: 12, offset: const Offset(0, 4)),
+                ],
+              ),
+              child: Icon(getCategoryIcon(category), color: isSelected ? Colors.white : color, size: 24),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
             Text(
-              label,
+              getCategoryLabel(category),
               style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: color,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                color: isSelected ? (isDark ? Colors.white : Colors.black) : Colors.grey[500],
               ),
               textAlign: TextAlign.center,
             ),
@@ -290,39 +245,23 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   Widget _buildDatePicker() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: _selectDate,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.grey[100],
-          border: Border.all(color: Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(12),
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!, width: 1.5),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Date',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
-                      ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  DateFormat('dd MMM yyyy').format(_selectedDate),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-              ],
-            ),
-            Icon(
-              Icons.calendar_today,
-              color: AppConstants.primaryColor,
+            Icon(Icons.calendar_today_rounded, color: AppConstants.primaryColor),
+            const SizedBox(width: 16),
+            Text(
+              DateFormat('MMMM dd, yyyy').format(_selectedDate),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
           ],
         ),
@@ -337,29 +276,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
     );
-
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
+    if (picked != null && picked != _selectedDate) setState(() => _selectedDate = picked);
   }
 
   Future<void> _saveTransaction() async {
-    if (_amountController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter an amount')),
-      );
-      return;
-    }
-
     final amount = double.tryParse(_amountController.text);
-    if (amount == null || amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid amount')),
-      );
-      return;
-    }
+    if (amount == null || amount <= 0) return;
 
     final transaction = Transaction(
       id: widget.transaction?.id,
@@ -367,38 +289,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       type: _transactionType,
       category: _selectedCategory,
       date: _selectedDate,
-      description: _descriptionController.text.isEmpty
-          ? null
-          : _descriptionController.text,
+      description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
     );
 
-    try {
-      if (widget.transaction != null) {
-        await context
-            .read<TransactionProvider>()
-            .updateTransaction(transaction);
-      } else {
-        await context
-            .read<TransactionProvider>()
-            .addTransaction(transaction);
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(widget.transaction != null
-                ? 'Transaction updated successfully'
-                : 'Transaction added successfully'),
-          ),
-        );
-        Navigator.pop(context);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
-        );
-      }
-    }
+    widget.transaction != null ? await context.read<TransactionProvider>().updateTransaction(transaction) : await context.read<TransactionProvider>().addTransaction(transaction);
+    if (mounted) Navigator.pop(context);
   }
 }

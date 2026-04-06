@@ -21,7 +21,7 @@ class SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -30,7 +30,9 @@ class SummaryCard extends StatelessWidget {
           color: isDark ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? Colors.white.withOpacity(0.05) : color.withOpacity(0.1),
+            color: isDark
+                ? Colors.white.withOpacity(0.05)
+                : color.withOpacity(0.1),
             width: 1.5,
           ),
           boxShadow: [
@@ -60,18 +62,18 @@ class SummaryCard extends StatelessWidget {
                   Text(
                     label,
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          color: Colors.grey[500],
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
+                      color: Colors.grey[500],
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     amount,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: isDark ? Colors.white : const Color(0xFF111827),
-                        ),
+                      fontWeight: FontWeight.w800,
+                      color: isDark ? Colors.white : const Color(0xFF111827),
+                    ),
                   ),
                 ],
               ),
@@ -129,7 +131,9 @@ class TransactionListItem extends StatelessWidget {
             color: isDark ? const Color(0xFF1E293B) : Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+              color: isDark
+                  ? Colors.white.withOpacity(0.05)
+                  : Colors.grey[100]!,
               width: 1.5,
             ),
             boxShadow: [
@@ -159,8 +163,8 @@ class TransactionListItem extends StatelessWidget {
                     Text(
                       title,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
+                        fontWeight: FontWeight.w700,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -168,8 +172,8 @@ class TransactionListItem extends StatelessWidget {
                     Text(
                       date,
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: Colors.grey[500],
-                          ),
+                        color: Colors.grey[500],
+                      ),
                     ),
                   ],
                 ),
@@ -177,11 +181,11 @@ class TransactionListItem extends StatelessWidget {
               Text(
                 amount,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: amount.startsWith('+') 
-                          ? AppConstants.successColor 
-                          : (isDark ? Colors.white : const Color(0xFF111827)),
-                    ),
+                  fontWeight: FontWeight.w800,
+                  color: amount.startsWith('+')
+                      ? AppConstants.successColor
+                      : (isDark ? Colors.white : const Color(0xFF111827)),
+                ),
               ),
             ],
           ),
@@ -243,14 +247,17 @@ class GoalProgressCard extends StatelessWidget {
                   child: Text(
                     goalTitle,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                        ),
+                      fontWeight: FontWeight.w800,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: primaryColor.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(12),
@@ -258,9 +265,9 @@ class GoalProgressCard extends StatelessWidget {
                   child: Text(
                     '${(progressPercentage * 100).toStringAsFixed(0)}%',
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: primaryColor,
-                        ),
+                      fontWeight: FontWeight.w800,
+                      color: primaryColor,
+                    ),
                   ),
                 ),
               ],
@@ -271,7 +278,9 @@ class GoalProgressCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: progressPercentage.clamp(0.0, 1.0),
                 minHeight: 10,
-                backgroundColor: isDark ? const Color(0xFF334155) : Colors.grey[200],
+                backgroundColor: isDark
+                    ? const Color(0xFF334155)
+                    : Colors.grey[200],
                 valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
               ),
             ),
@@ -282,16 +291,16 @@ class GoalProgressCard extends StatelessWidget {
                 Text(
                   currentAmount,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: Colors.grey[500],
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: Colors.grey[500],
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 Text(
                   targetAmount,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        color: isDark ? Colors.white : const Color(0xFF111827),
-                        fontWeight: FontWeight.w800,
-                      ),
+                    color: isDark ? Colors.white : const Color(0xFF111827),
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ],
             ),
@@ -303,6 +312,7 @@ class GoalProgressCard extends StatelessWidget {
 }
 
 // Empty State Widget - Button Padding Fixed
+// Empty State Widget - Overflow Fixed
 class EmptyState extends StatelessWidget {
   final String title;
   final String message;
@@ -322,51 +332,57 @@ class EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppConstants.primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                size: 64,
-                color: AppConstants.primaryColor.withOpacity(0.7),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[500],
-                    height: 1.5,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            if (onAction != null && actionLabel != null) ...[
-              const SizedBox(height: 32),
-              ElevatedButton(
-                onPressed: onAction,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Proper padding
+      // 🛠️ FIX: Added SingleChildScrollView so the content can scroll when the keyboard pops up
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppConstants.primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
-                child: Text(actionLabel!),
+                child: Icon(
+                  icon,
+                  size: 64,
+                  color: AppConstants.primaryColor.withOpacity(0.7),
+                ),
               ),
+              const SizedBox(height: 24),
+              Text(
+                title,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                message,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey[500],
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              if (onAction != null && actionLabel != null) ...[
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: onAction,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                  ),
+                  child: Text(actionLabel!),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
