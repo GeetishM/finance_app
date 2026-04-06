@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:finance_app/utils/constants.dart'; // 🛠️ ADDED: Import to access AppConstants
 
 class AnimatedTransactionListItem extends StatefulWidget {
   final String title;
@@ -7,7 +8,7 @@ class AnimatedTransactionListItem extends StatefulWidget {
   final Color categoryColor;
   final IconData categoryIcon;
   final VoidCallback? onTap;
-  final VoidCallback? onEdit; // 🛠️ ADDED: New onEdit callback
+  final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
   const AnimatedTransactionListItem({
@@ -72,13 +73,12 @@ class _AnimatedTransactionListItemState
         opacity: _opacityAnimation,
         child: Dismissible(
           key: Key(widget.title + widget.date),
-          // 🛠️ UX FIX: Allow swiping both left and right
           direction: DismissDirection.horizontal,
           
-          // 🛠️ UX FIX: Background for sliding Left-to-Right (EDIT)
+          // 🛠️ UI FIX: Changed from Primary Purple to Success Green
           background: Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF6366F1), // Primary Indigo Color
+              color: AppConstants.successColor, // Now uses your app's green!
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.centerLeft,
@@ -86,10 +86,9 @@ class _AnimatedTransactionListItemState
             child: const Icon(Icons.edit_rounded, color: Colors.white, size: 28),
           ),
 
-          // 🛠️ UX FIX: Background for sliding Right-to-Left (DELETE)
           secondaryBackground: Container(
             decoration: BoxDecoration(
-              color: Colors.red,
+              color: AppConstants.errorColor, // Using your standard red
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.centerRight,
@@ -99,41 +98,43 @@ class _AnimatedTransactionListItemState
 
           confirmDismiss: (direction) async {
             if (direction == DismissDirection.startToEnd) {
-              // 🛠️ Trigger Edit action
               widget.onEdit?.call();
-              // Return false so the item bounces back and isn't removed from the list
               return false; 
             } else if (direction == DismissDirection.endToStart) {
-              // 🛠️ Trigger Delete confirmation
               return await showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(24),
                     ),
+                    backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
                     title: Text(
                       "Delete Transaction",
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w800,
                           ),
                     ),
                     content: const Text(
                       "Are you sure you want to delete this transaction?",
+                      style: TextStyle(height: 1.5),
                     ),
-                    actionsPadding: const EdgeInsets.all(16),
+                    actionsPadding: const EdgeInsets.all(20),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text("Cancel"),
+                        child: Text(
+                          "Cancel", 
+                          style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w700)
+                        ),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
+                          backgroundColor: AppConstants.errorColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         ),
                         onPressed: () => Navigator.of(context).pop(true),
                         child: const Text(
@@ -149,7 +150,6 @@ class _AnimatedTransactionListItemState
             return false;
           },
           onDismissed: (direction) {
-            // Only trigger onDelete if swiped right-to-left
             if (direction == DismissDirection.endToStart) {
               widget.onDelete?.call();
             }
@@ -161,17 +161,18 @@ class _AnimatedTransactionListItemState
               margin: const EdgeInsets.only(bottom: 8),
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16), // Softer corners
                 border: Border.all(
-                  color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
-                  width: 1,
+                  color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+                  width: 1.5,
                 ),
                 boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
+                  if (!isDark)
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
                 ],
               ),
               child: Row(
@@ -180,13 +181,13 @@ class _AnimatedTransactionListItemState
                     duration: const Duration(milliseconds: 300),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: widget.categoryColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(10),
+                      color: widget.categoryColor.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12), // Match the card roundness
                     ),
                     child: Icon(widget.categoryIcon,
                         color: widget.categoryColor, size: 20),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,18 +198,20 @@ class _AnimatedTransactionListItemState
                               .textTheme
                               .bodyMedium
                               ?.copyWith(
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w700,
                               ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
+                        const SizedBox(height: 2),
                         Text(
                           widget.date,
                           style: Theme.of(context)
                               .textTheme
-                              .bodySmall
+                              .labelMedium
                               ?.copyWith(
                                 color: Colors.grey[500],
+                                fontWeight: FontWeight.w600,
                               ),
                         ),
                       ],
@@ -216,8 +219,8 @@ class _AnimatedTransactionListItemState
                   ),
                   Text(
                     widget.amount,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
                           color: widget.categoryColor,
                         ),
                   ),

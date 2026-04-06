@@ -1,30 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart'; // 🛠️ ADDED: To check system theme
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:finance_app/services/database_service.dart'; // 🛠️ ADDED: To save/load preference
+import 'package:finance_app/services/database_service.dart';
 
 class ThemeProvider extends ChangeNotifier {
   bool _isDarkMode = false;
   bool get isDarkMode => _isDarkMode;
 
-  // 🛠️ ADDED: Constructor to load theme instantly when app starts
   ThemeProvider() {
     _loadThemePreference();
   }
 
-  // 🛠️ ADDED: Logic to check Hive or System Default
   void _loadThemePreference() {
     final savedTheme = DatabaseService.getTheme();
 
     if (savedTheme != null) {
-      // If user has opened the app before, use their saved preference
       _isDarkMode = savedTheme;
     } else {
-      // If first time, check the system brightness (iOS/Android settings)
       var brightness =
           SchedulerBinding.instance.platformDispatcher.platformBrightness;
       _isDarkMode = brightness == Brightness.dark;
-      // Save this initial system preference so we remember it
       DatabaseService.saveTheme(_isDarkMode);
     }
     notifyListeners();
@@ -32,17 +27,16 @@ class ThemeProvider extends ChangeNotifier {
 
   void toggleTheme() {
     _isDarkMode = !_isDarkMode;
-    DatabaseService.saveTheme(_isDarkMode); // 🛠️ Save choice on toggle
+    DatabaseService.saveTheme(_isDarkMode);
     notifyListeners();
   }
 
   void setTheme(bool isDark) {
     _isDarkMode = isDark;
-    DatabaseService.saveTheme(_isDarkMode); // 🛠️ Save choice on set
+    DatabaseService.saveTheme(_isDarkMode);
     notifyListeners();
   }
 
-  // Define our core text theme using Google Fonts
   TextTheme _getTextTheme(Brightness brightness) {
     return GoogleFonts.plusJakartaSansTextTheme(
       ThemeData(brightness: brightness).textTheme,
@@ -54,52 +48,44 @@ class ThemeProvider extends ChangeNotifier {
       useMaterial3: true,
       brightness: Brightness.light,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF4F46E5), // Deeper Indigo
+        seedColor: const Color(0xFF7C3AED), // 🛠️ Premium Purple Light
         brightness: Brightness.light,
-        background: const Color(0xFFF9FAFB), // Ultra-light gray for depth
-        surface: Colors.white,
       ),
-      scaffoldBackgroundColor: const Color(0xFFF9FAFB),
-      textTheme: _getTextTheme(Brightness.light),
+      scaffoldBackgroundColor: const Color(0xFFF8F7FF),
       appBarTheme: const AppBarTheme(
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Color(0xFF111827), // Deep slate
+        backgroundColor: Color(0xFFF8F7FF),
+        foregroundColor: Color(0xFF1F2937),
         centerTitle: false,
-        scrolledUnderElevation: 0,
       ),
       cardTheme: CardThemeData(
-        elevation: 8,
-        shadowColor: const Color(0xFF4F46E5).withOpacity(0.08),
+        elevation: 0,
         color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24), // Softer, modern corners
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 16,
-        ),
+        fillColor: Colors.grey[100],
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none, // Remove harsh borders
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFF4F46E5), width: 2),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Color(0xFF7C3AED),
+            width: 2,
+          ), // Purple Border
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: const Color(0xFF4F46E5),
+          backgroundColor: const Color(0xFF7C3AED), // Purple Button
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
@@ -119,50 +105,44 @@ class ThemeProvider extends ChangeNotifier {
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF6366F1), // Brighter indigo for dark mode
+        seedColor: const Color(0xFF8B5CF6), // 🛠️ Vibrant Purple Dark
         brightness: Brightness.dark,
-        background: const Color(0xFF0B1120), // Deep rich midnight
-        surface: const Color(0xFF1E293B),
       ),
-      scaffoldBackgroundColor: const Color(0xFF0B1120),
-      textTheme: _getTextTheme(Brightness.dark),
+      scaffoldBackgroundColor: const Color(0xFF0F172A),
       appBarTheme: const AppBarTheme(
         elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Color(0xFFF3F4F6),
+        backgroundColor: Color(0xFF0F172A),
+        foregroundColor: Color(0xFFE5E7EB),
         centerTitle: false,
-        scrolledUnderElevation: 0,
       ),
       cardTheme: CardThemeData(
-        elevation: 12,
-        shadowColor: Colors.black.withOpacity(0.4),
-        color: const Color(0xFF1E293B), // Slate surface
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        elevation: 0,
+        color: const Color(0xFF1E293B),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: const Color(0xFF1E293B),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 16,
-        ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Color(0xFF8B5CF6),
+            width: 2,
+          ), // Purple Border
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: const Color(0xFF6366F1),
+          backgroundColor: const Color(0xFF8B5CF6), // Purple Button
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(

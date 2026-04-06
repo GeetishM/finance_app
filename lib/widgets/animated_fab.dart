@@ -19,22 +19,19 @@ class _AnimatedFABState extends State<AnimatedFAB>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
-  late Animation<double> _rotationAnimation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 400),
+      // Smooth, formal entrance duration
+      duration: const Duration(milliseconds: 400), 
       vsync: this,
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-    );
-
-    _rotationAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    // Premium entrance: Smooth deceleration instead of a playful bounce
+    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutQuart),
     );
 
     _controller.forward();
@@ -46,24 +43,48 @@ class _AnimatedFABState extends State<AnimatedFAB>
     super.dispose();
   }
 
-  void _onPressed() {
-    _controller.reverse().then((_) {
-      widget.onPressed();
-      _controller.forward();
-    });
+  void _onPressed() async {
+    // 1. Subtle, quick shrink on tap (mimics a physical button press)
+    await _controller.animateTo(
+      0.85, 
+      duration: const Duration(milliseconds: 100), 
+      curve: Curves.easeOut,
+    );
+    
+    // 2. Trigger the actual navigation/action
+    widget.onPressed();
+    
+    // 3. Smoothly pop back to original size
+    _controller.animateTo(
+      1.0, 
+      duration: const Duration(milliseconds: 250), 
+      curve: Curves.easeOutBack,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return ScaleTransition(
       scale: _scaleAnimation,
-      child: RotationTransition(
-        turns: _rotationAnimation,
+      child: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: AppConstants.primaryGradient,
+          boxShadow: [
+            BoxShadow(
+              color: AppConstants.primaryColor.withOpacity(0.4),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
         child: FloatingActionButton(
+          elevation: 0, 
+          highlightElevation: 0,
+          backgroundColor: Colors.transparent, 
           onPressed: _onPressed,
-          backgroundColor: AppConstants.primaryColor,
-          elevation: 8,
-          child: const Icon(Icons.add, size: 28),
+          // Removed the RotationTransition for a cleaner, static icon
+          child: Icon(widget.icon, color: Colors.white, size: 28),
         ),
       ),
     );
