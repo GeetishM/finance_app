@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  google_nav_bar: ^5.0.6
   # State Management
   provider: ^6.1.5+1
 

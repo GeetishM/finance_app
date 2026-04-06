@@ -3,10 +3,11 @@ import 'package:finance_app/providers/transaction_provider.dart';
 import 'package:finance_app/screens/add_transaction_screen.dart';
 import 'package:finance_app/utils/constants.dart';
 import 'package:finance_app/utils/helpers.dart';
+import 'package:finance_app/widgets/animated_fab.dart';
+import 'package:finance_app/widgets/animated_transaction_item.dart';
 import 'package:finance_app/widgets/common_widgets.dart';
 import 'package:flutter/material.dart' hide DateUtils;
 import 'package:provider/provider.dart';
-
 
 class TransactionsScreen extends StatefulWidget {
   const TransactionsScreen({Key? key}) : super(key: key);
@@ -37,9 +38,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       appBar: AppBar(
         title: Text(
           'Transactions',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
       ),
@@ -94,8 +95,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.tune,
@@ -107,10 +107,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                   Text(
                                     'Filters',
                                     style: TextStyle(
-                                      color:
-                                          _showFilters
-                                              ? Colors.white
-                                              : Colors.grey[700],
+                                      color: _showFilters
+                                          ? Colors.white
+                                          : Colors.grey[700],
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -159,17 +158,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         itemCount: provider.transactions.length,
                         itemBuilder: (context, index) {
                           final transaction = provider.transactions[index];
-                          return TransactionListItem(
-                            title:
-                                getCategoryLabel(transaction.category),
+                          return AnimatedTransactionListItem(
+                            title: getCategoryLabel(transaction.category),
                             amount:
                                 '${transaction.type == TransactionType.income ? '+' : '-'} ${NumberUtils.formatCurrency(transaction.amount)}',
-                            date: DateUtils
-                                .formatDateTimeCompact(transaction.date),
-                            categoryColor:
-                                getCategoryColor(transaction.category),
-                            categoryIcon:
-                                getCategoryIcon(transaction.category),
+                            date: DateUtils.formatDateTimeCompact(
+                              transaction.date,
+                            ),
+                            categoryColor: getCategoryColor(
+                              transaction.category,
+                            ),
+                            categoryIcon: getCategoryIcon(transaction.category),
                             onTap: () => _navigateToEditTransaction(
                               context,
                               transaction,
@@ -184,9 +183,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: AnimatedFAB(
         onPressed: () => _navigateToAddTransaction(context),
-        child: const Icon(Icons.add),
       ),
     );
   }
@@ -201,9 +199,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           // Type Filter
           Text(
             'Transaction Type',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -217,8 +215,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               _buildFilterChip(
                 label: 'Income',
                 selected: provider.selectedType == TransactionType.income,
-                onSelected: () =>
-                    provider.filterByType(TransactionType.income),
+                onSelected: () => provider.filterByType(TransactionType.income),
               ),
               _buildFilterChip(
                 label: 'Expense',
@@ -232,9 +229,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           // Category Filter
           Text(
             'Category',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -243,15 +240,13 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               _buildFilterChip(
                 label: 'All',
                 selected: provider.selectedCategory == null,
-                onSelected: () =>
-                    provider.filterByCategory(null),
+                onSelected: () => provider.filterByCategory(null),
               ),
               ...TransactionCategory.values.map((category) {
                 return _buildFilterChip(
                   label: getCategoryLabel(category),
                   selected: provider.selectedCategory == category,
-                  onSelected: () =>
-                      provider.filterByCategory(category),
+                  onSelected: () => provider.filterByCategory(category),
                   color: getCategoryColor(category),
                 );
               }).toList(),
@@ -298,9 +293,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   void _navigateToAddTransaction(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const AddTransactionScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const AddTransactionScreen()),
     );
   }
 
@@ -311,8 +304,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            AddTransactionScreen(transaction: transaction),
+        builder: (context) => AddTransactionScreen(transaction: transaction),
       ),
     );
   }
@@ -331,17 +323,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               context.read<TransactionProvider>().deleteTransaction(id);
               Navigator.pop(context);
             },
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

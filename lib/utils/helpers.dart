@@ -96,3 +96,18 @@ class NumberUtils {
     return double.parse(value.toStringAsFixed(2));
   }
 }
+
+class AnimationHelpers {
+  static Duration getDuration(AnimationDuration duration) {
+    switch (duration) {
+      case AnimationDuration.fast:
+        return const Duration(milliseconds: 200);
+      case AnimationDuration.normal:
+        return const Duration(milliseconds: 300);
+      case AnimationDuration.slow:
+        return const Duration(milliseconds: 500);
+    }
+  }
+}
+
+enum AnimationDuration { fast, normal, slow }

@@ -6,6 +6,7 @@ import 'package:finance_app/screens/home_screen.dart';
 import 'package:finance_app/screens/insights_screen.dart';
 import 'package:finance_app/screens/transactions_screen.dart';
 import 'package:finance_app/services/database_service.dart';
+import 'package:finance_app/widgets/custom_bottom_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -44,6 +45,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
+
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
 
@@ -65,31 +68,9 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        elevation: 10,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long),
-            label: 'Transactions',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.flag),
-            label: 'Goals',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Insights',
-          ),
-        ],
-        onTap: (index) {
+        onTabChange: (index) {
           setState(() {
             _currentIndex = index;
           });
