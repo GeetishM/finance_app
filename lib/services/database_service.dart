@@ -19,6 +19,14 @@ class DatabaseService {
     await box.put(reminderMinuteKey, minute);
   }
 
+  static Future<void> clearAllData() async {
+    // 🛠️ FIXED: Added the strong types so Hive doesn't throw a Box mismatch error
+    // Also using your static variables to prevent typos
+    await Hive.box<Transaction>(transactionsBox).clear();
+    await Hive.box<SavingsGoal>(goalsBox).clear();
+    // await Hive.box(settingsBox).clear(); // Optional: keep settings or wipe them too
+  }
+
   static Map<String, int> getReminderTime() {
     final box = Hive.box(settingsBox);
     return {
