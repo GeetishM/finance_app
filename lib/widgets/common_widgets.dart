@@ -311,8 +311,7 @@ class GoalProgressCard extends StatelessWidget {
   }
 }
 
-// Empty State Widget - Button Padding Fixed
-// Empty State Widget - Overflow Fixed
+// Empty State Widget - Button Padding Fixed!
 class EmptyState extends StatelessWidget {
   final String title;
   final String message;
@@ -332,53 +331,53 @@ class EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      // 🛠️ FIX: Added SingleChildScrollView so the content can scroll when the keyboard pops up
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: AppConstants.primaryColor.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  size: 64,
-                  color: AppConstants.primaryColor.withOpacity(0.7),
-                ),
+              Icon(
+                icon,
+                size: 64,
+                color: Colors.grey[400],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               Text(
                 title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
                 message,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[500],
-                  height: 1.5,
-                ),
+                      color: Colors.grey[600],
+                    ),
                 textAlign: TextAlign.center,
               ),
               if (onAction != null && actionLabel != null) ...[
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: onAction,
+                  // 🛠️ UI FIX: Added proper padding and border radius!
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
+                    backgroundColor: AppConstants.primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: Text(actionLabel!),
+                  child: Text(
+                    actionLabel!,
+                    style: const TextStyle(
+                      fontSize: 16, 
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ],

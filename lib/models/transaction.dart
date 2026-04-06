@@ -3,20 +3,25 @@ import 'package:uuid/uuid.dart';
 
 part 'transaction.g.dart';
 
-enum TransactionType { income, expense }
+@HiveType(typeId: 2) // Added HiveType for the enum
+enum TransactionType { 
+  @HiveField(0) income, 
+  @HiveField(1) expense 
+}
 
+@HiveType(typeId: 3) // Added HiveType for the enum
 enum TransactionCategory {
-  food,
-  transport,
-  entertainment,
-  utilities,
-  shopping,
-  health,
-  education,
-  other,
-  salary,
-  freelance,
-  bonus,
+  @HiveField(0) food,
+  @HiveField(1) transport,
+  @HiveField(2) entertainment,
+  @HiveField(3) utilities,
+  @HiveField(4) shopping,
+  @HiveField(5) health,
+  @HiveField(6) education,
+  @HiveField(7) other,
+  @HiveField(8) salary,
+  @HiveField(9) freelance,
+  @HiveField(10) bonus,
 }
 
 @HiveType(typeId: 0)

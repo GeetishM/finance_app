@@ -1,7 +1,7 @@
 import 'package:finance_app/models/transaction.dart';
 import 'package:finance_app/services/database_service.dart';
+import 'package:finance_app/utils/constants.dart'; // Added this import for category labels
 import 'package:flutter/foundation.dart';
-
 
 class TransactionProvider extends ChangeNotifier {
   List<Transaction> _transactions = [];
@@ -12,10 +12,15 @@ class TransactionProvider extends ChangeNotifier {
   DateTime? _startDate;
   DateTime? _endDate;
 
-  // Getters
-  List<Transaction> get transactions => _filteredTransactions.isEmpty
-      ? _transactions
-      : _filteredTransactions;
+  bool get isFilterActive =>
+      _searchQuery.isNotEmpty ||
+      _selectedType != null ||
+      _selectedCategory != null ||
+      _startDate != null;
+
+  List<Transaction> get transactions => isFilterActive
+      ? _filteredTransactions
+      : _transactions;
 
   List<Transaction> get allTransactions => _transactions;
 
@@ -96,6 +101,23 @@ class TransactionProvider extends ChangeNotifier {
 
   void filterByType(TransactionType? type) {
     _selectedType = type;
+
+    if (type == TransactionType.income) {
+      if (_selectedCategory != null &&
+          _selectedCategory != TransactionCategory.salary &&
+          _selectedCategory != TransactionCategory.freelance &&
+          _selectedCategory != TransactionCategory.bonus &&
+          _selectedCategory != TransactionCategory.other) {
+        _selectedCategory = null; 
+      }
+    } else if (type == TransactionType.expense) {
+      if (_selectedCategory == TransactionCategory.salary ||
+          _selectedCategory == TransactionCategory.freelance ||
+          _selectedCategory == TransactionCategory.bonus) {
+        _selectedCategory = null; 
+      }
+    }
+
     applyFilters();
     notifyListeners();
   }
@@ -125,27 +147,31 @@ class TransactionProvider extends ChangeNotifier {
 
   void applyFilters() {
     _filteredTransactions = _transactions.where((transaction) {
-      // Search query filter
+      
+      // 🛠️ SMART SEARCH FIX: Check both Description AND Category Name
       if (_searchQuery.isNotEmpty) {
-        final matchesSearch = transaction.description
+        final query = _searchQuery.toLowerCase();
+        
+        final matchesDescription = transaction.description
                 ?.toLowerCase()
-                .contains(_searchQuery.toLowerCase()) ??
+                .contains(query) ??
             false;
-        if (!matchesSearch) return false;
+            
+        final categoryName = getCategoryLabel(transaction.category).toLowerCase();
+        final matchesCategory = categoryName.contains(query);
+
+        if (!matchesDescription && !matchesCategory) return false;
       }
 
-      // Type filter
       if (_selectedType != null && transaction.type != _selectedType) {
         return false;
       }
 
-      // Category filter
       if (_selectedCategory != null &&
           transaction.category != _selectedCategory) {
         return false;
       }
 
-      // Date range filter
       if (_startDate != null && _endDate != null) {
         final transactionDate =
             DateTime(transaction.date.year, transaction.date.month, transaction.date.day);
@@ -165,7 +191,7 @@ class TransactionProvider extends ChangeNotifier {
 
   List<Transaction> getWeeklyTransactions() {
     final now = DateTime.now();
-    final weekAgo = now.subtract(Duration(days: 7));
+    final weekAgo = now.subtract(const Duration(days: 7));
 
     return _transactions
         .where((t) =>

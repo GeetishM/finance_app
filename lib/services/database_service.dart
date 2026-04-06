@@ -18,6 +18,15 @@ class DatabaseService {
     if (!Hive.isAdapterRegistered(1)) {
       Hive.registerAdapter(SavingsGoalAdapter());
     }
+    
+    // --- ADD THESE TWO NEW ADAPTERS ---
+    if (!Hive.isAdapterRegistered(2)) {
+      Hive.registerAdapter(TransactionTypeAdapter());
+    }
+    if (!Hive.isAdapterRegistered(3)) {
+      Hive.registerAdapter(TransactionCategoryAdapter());
+    }
+    // ----------------------------------
 
     // Open boxes
     await Hive.openBox<Transaction>(transactionsBox);
