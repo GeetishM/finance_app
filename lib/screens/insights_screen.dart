@@ -1,12 +1,14 @@
 import 'package:finance_app/models/transaction.dart';
 import 'package:finance_app/providers/transaction_provider.dart';
+import 'package:finance_app/screens/add_transaction_screen.dart';
+import 'package:finance_app/utils/animations.dart';
 import 'package:finance_app/utils/constants.dart';
 import 'package:finance_app/utils/helpers.dart';
+import 'package:finance_app/widgets/animated_fab.dart';
 import 'package:finance_app/widgets/common_widgets.dart';
 import 'package:flutter/material.dart' hide DateUtils;
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
-
 
 class InsightsScreen extends StatefulWidget {
   const InsightsScreen({Key? key}) : super(key: key);
@@ -24,8 +26,8 @@ class _InsightsScreenState extends State<InsightsScreen> {
       appBar: AppBar(
         title: Text(
           'Insights',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w800,
               ),
         ),
         elevation: 0,
@@ -35,83 +37,130 @@ class _InsightsScreenState extends State<InsightsScreen> {
           if (provider.allTransactions.isEmpty) {
             return EmptyState(
               title: 'No Data Yet',
-              message: 'Add transactions to see insights',
-              icon: Icons.analytics,
+              message: 'Add transactions to generate beautiful insights',
+              icon: Icons.analytics_rounded,
+              actionLabel: 'Add First Entry',
+              onAction: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AddTransactionScreen(),
+                ),
+              ),
             );
           }
 
           return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              // 🛠️ UI FIX: 20px horizontal padding to perfectly match the Home Screen margins
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Period Selector
                   _buildPeriodSelector(),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
 
                   // Summary Cards
-                  _buildSummarySection(context, provider),
+                  SlideInAnimation(
+                    beginOffset: const Offset(0, 0.2),
+                    child: _buildSummarySection(context, provider),
+                  ),
                   const SizedBox(height: 24),
 
                   // Trend Chart
-                  _buildTrendChart(context, provider),
+                  SlideInAnimation(
+                    beginOffset: const Offset(0, 0.4),
+                    child: _buildTrendChart(context, provider),
+                  ),
                   const SizedBox(height: 24),
 
                   // Top Spending Categories
-                  _buildTopSpendingCategories(context, provider),
+                  SlideInAnimation(
+                    beginOffset: const Offset(0, 0.6),
+                    child: _buildTopSpendingCategories(context, provider),
+                  ),
                   const SizedBox(height: 24),
 
                   // Category Breakdown
-                  _buildCategoryBreakdown(context, provider),
-                  const SizedBox(height: 32),
+                  SlideInAnimation(
+                    beginOffset: const Offset(0, 0.8),
+                    child: _buildCategoryBreakdown(context, provider),
+                  ),
+                  const SizedBox(height: 100), // Padding for the FAB
                 ],
               ),
             ),
           );
         },
       ),
+      // 🛠️ ADDED: Animated FAB for quick adding from the Insights page
+      floatingActionButton: AnimatedFAB(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AddTransactionScreen(),
+            ),
+          );
+        },
+        icon: Icons.add,
+      ),
     );
   }
 
   Widget _buildPeriodSelector() {
-    return Row(
-      children: ['Weekly', 'Monthly', 'Yearly']
-          .map(
-            (period) => Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedPeriod = period;
-                  });
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: BoxDecoration(
-                    color: _selectedPeriod == period
-                        ? AppConstants.primaryColor
-                        : Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    period,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color:
-                          _selectedPeriod == period
-                              ? Colors.white
-                              : Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF1E293B) : Colors.grey[200],
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: ['Weekly', 'Monthly', 'Yearly'].map((period) {
+          final isSelected = _selectedPeriod == period;
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedPeriod = period;
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? (isDark ? const Color(0xFF334155) : Colors.white)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: isSelected && !isDark
+                      ? [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          )
+                        ]
+                      : [],
+                ),
+                child: Text(
+                  period,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isSelected
+                        ? (isDark ? Colors.white : Colors.black)
+                        : Colors.grey[500],
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                   ),
                 ),
               ),
             ),
-          )
-          .toList()
-          .expand((widget) => [widget, const SizedBox(width: 8)])
-          .toList()
-          .sublist(0, 5),
+          );
+        }).toList(),
+      ),
     );
   }
 
@@ -142,12 +191,12 @@ class _InsightsScreenState extends State<InsightsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '${_selectedPeriod} Overview',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+          '$_selectedPeriod Overview',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w800,
               ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Row(
           children: [
             Expanded(
@@ -155,28 +204,26 @@ class _InsightsScreenState extends State<InsightsScreen> {
                 label: 'Income',
                 amount: NumberUtils.formatCurrency(income),
                 color: AppConstants.successColor,
-                icon: Icons.trending_up,
+                icon: Icons.trending_up_rounded,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             Expanded(
               child: SummaryCard(
                 label: 'Expenses',
                 amount: NumberUtils.formatCurrency(expenses),
                 color: AppConstants.errorColor,
-                icon: Icons.trending_down,
+                icon: Icons.trending_down_rounded,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         SummaryCard(
-          label: 'Savings',
+          label: 'Net Savings',
           amount: NumberUtils.formatCurrency(savings),
-          color: savings >= 0
-              ? AppConstants.successColor
-              : AppConstants.errorColor,
-          icon: Icons.favorite,
+          color: savings >= 0 ? AppConstants.primaryColor : AppConstants.errorColor,
+          icon: savings >= 0 ? Icons.account_balance_wallet_rounded : Icons.money_off_rounded,
         ),
       ],
     );
@@ -208,46 +255,61 @@ class _InsightsScreenState extends State<InsightsScreen> {
     final sortedDates = dateMap.entries.toList()
       ..sort((a, b) => a.key.compareTo(b.key));
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (sortedDates.isEmpty) {
       return Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[300]!, width: 1),
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+            width: 1.5,
+          ),
         ),
         child: Center(
           child: Text(
-            'No data available',
-            style: Theme.of(context).textTheme.bodyMedium,
+            'No expense data for this period',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Colors.grey[500],
+                  fontWeight: FontWeight.w600,
+                ),
           ),
         ),
       );
     }
 
-    final maxExpense = sortedDates.isNotEmpty
-        ? sortedDates.map((e) => e.value).reduce((a, b) => a > b ? a : b)
-        : 1.0;
-
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24), // Premium padding
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[300]!, width: 1),
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+          width: 1.5,
+        ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Daily Expense Trend',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 32),
           SizedBox(
-            height: 200,
+            height: 220, // Slightly taller for a more impressive chart
             child: BarChart(
               BarChartData(
                 barGroups: List.generate(
@@ -258,39 +320,51 @@ class _InsightsScreenState extends State<InsightsScreen> {
                       BarChartRodData(
                         toY: sortedDates[index].value,
                         color: AppConstants.primaryColor,
-                        width: 8,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(4),
-                          topRight: Radius.circular(4),
-                        ),
+                        width: 12, // 🛠️ UX FIX: Thicker, rounder bars!
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ],
                   ),
                 ),
                 borderData: FlBorderData(show: false),
-                gridData: const FlGridData(show: false),
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: false,
+                  horizontalInterval: _calculateInterval(sortedDates),
+                  getDrawingHorizontalLine: (value) {
+                    return FlLine(
+                      color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
+                      strokeWidth: 1,
+                    );
+                  },
+                ),
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
-                        if (index < sortedDates.length) {
-                          return Text(
-                            sortedDates[index].key,
-                            style:
-                                Theme.of(context).textTheme.labelSmall,
+                        if (index >= 0 && index < sortedDates.length) {
+                          // Display just the day number to keep it clean (e.g. "12" instead of "Apr 12")
+                          String dayStr = sortedDates[index].key.split(' ').last;
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(
+                              dayStr,
+                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: Colors.grey[500],
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
                           );
                         }
                         return const Text('');
                       },
                     ),
                   ),
-                  leftTitles: const AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: false,
-                    ),
-                  ),
+                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
               ),
             ),
@@ -298,6 +372,14 @@ class _InsightsScreenState extends State<InsightsScreen> {
         ],
       ),
     );
+  }
+
+  // Helper method to keep grid lines manageable
+  double _calculateInterval(List<MapEntry<String, double>> data) {
+    if (data.isEmpty) return 100;
+    double max = data.map((e) => e.value).reduce((a, b) => a > b ? a : b);
+    if (max == 0) return 100;
+    return (max / 4).ceilToDouble(); // 4 horizontal grid lines
   }
 
   Widget _buildTopSpendingCategories(
@@ -329,37 +411,48 @@ class _InsightsScreenState extends State<InsightsScreen> {
     }
 
     final topCategories = sortedCategories.take(3).toList();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[300]!, width: 1),
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+          width: 1.5,
+        ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Top Spending Categories',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Column(
-            children: topCategories.asMap().entries.map((entry) {
-              final index = entry.key;
-              final category = entry.value.key;
-              final amount = entry.value.value;
+            children: topCategories.map((entry) {
+              final category = entry.key;
+              final amount = entry.value;
               final totalExpenses = sortedCategories.fold(
                 0.0,
-                (sum, entry) => sum + entry.value,
+                (sum, e) => sum + e.value,
               );
               final percentage = amount / totalExpenses;
 
               return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.only(bottom: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -369,54 +462,53 @@ class _InsightsScreenState extends State<InsightsScreen> {
                         Row(
                           children: [
                             Container(
-                              width: 12,
-                              height: 12,
+                              padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
+                                color: getCategoryColor(category).withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                getCategoryIcon(category),
                                 color: getCategoryColor(category),
-                                shape: BoxShape.circle,
+                                size: 20,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: 12),
                             Text(
                               getCategoryLabel(category),
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w600,
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
                                   ),
                             ),
                           ],
                         ),
                         Text(
                           '${(percentage * 100).toStringAsFixed(0)}%',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                fontWeight: FontWeight.w600,
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: getCategoryColor(category),
                               ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 12),
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(12),
                       child: LinearProgressIndicator(
                         value: percentage,
-                        minHeight: 6,
-                        backgroundColor: Colors.grey[300],
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(
+                        minHeight: 8, // 🛠️ UX FIX: Thicker progress bars
+                        backgroundColor: isDark ? const Color(0xFF334155) : Colors.grey[100],
+                        valueColor: AlwaysStoppedAnimation<Color>(
                           getCategoryColor(category),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     Text(
                       NumberUtils.formatCurrency(amount),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Colors.grey[600],
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: Colors.grey[500],
+                            fontWeight: FontWeight.w700,
                           ),
                     ),
                   ],
@@ -454,41 +546,56 @@ class _InsightsScreenState extends State<InsightsScreen> {
       return const SizedBox.shrink();
     }
 
+    final sortedCategories = categoryMap.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[300]!, width: 1),
+        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+          width: 1.5,
+        ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'All Categories',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Column(
-            children: categoryMap.entries.map((entry) {
+            children: sortedCategories.map((entry) {
               final category = entry.key;
               final amount = entry.value;
 
               return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(bottom: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color:
-                                getCategoryColor(category).withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
+                            color: getCategoryColor(category).withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
                             getCategoryIcon(category),
@@ -499,16 +606,16 @@ class _InsightsScreenState extends State<InsightsScreen> {
                         const SizedBox(width: 12),
                         Text(
                           getCategoryLabel(category),
-                          style:
-                              Theme.of(context).textTheme.bodyMedium,
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                       ],
                     ),
                     Text(
                       NumberUtils.formatCurrency(amount),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: getCategoryColor(category),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
                           ),
                     ),
                   ],

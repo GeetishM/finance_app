@@ -179,6 +179,7 @@ class TransactionListItem extends StatelessWidget {
   }
 }
 
+
 // Progress Indicator Widget
 class GoalProgressCard extends StatelessWidget {
   final String goalTitle;
@@ -205,14 +206,21 @@ class GoalProgressCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(24), // 🛠️ FIX: Increased from 16 to 24 to match the new wide margins
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1E293B) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
-            width: 1,
+            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+            width: 1.5,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,71 +231,56 @@ class GoalProgressCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     goalTitle,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8),
+                    color: primaryColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${(progressPercentage * 100).toStringAsFixed(0)}%',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
-                    ),
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: primaryColor,
+                        ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12), // Pill shaped
               child: LinearProgressIndicator(
                 value: progressPercentage.clamp(0.0, 1.0),
-                minHeight: 8,
-                backgroundColor: Colors.grey[300],
+                minHeight: 10,
+                backgroundColor: isDark ? const Color(0xFF334155) : Colors.grey[200],
                 valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      currentAmount,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      targetAmount,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
+                Text(
+                  currentAmount,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Colors.grey[500],
                         fontWeight: FontWeight.w600,
                       ),
-                    ),
-                  ),
+                ),
+                Text(
+                  targetAmount,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: isDark ? Colors.white : const Color(0xFF111827),
+                        fontWeight: FontWeight.w800,
+                      ),
                 ),
               ],
             ),

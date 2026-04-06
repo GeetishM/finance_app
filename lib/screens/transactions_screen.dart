@@ -113,12 +113,25 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             }
           }
 
+          // 🛠️ UX FIX: Smart Date Grouping Logic
+          final groupedItems = <dynamic>[];
+          String lastDate = '';
+          for (var tx in provider.transactions) {
+            String dateHeader = DateUtils.formatDateTimeCompact(tx.date);
+            if (dateHeader != lastDate) {
+              groupedItems.add(dateHeader);
+              lastDate = dateHeader;
+            }
+            groupedItems.add(tx);
+          }
+
           return Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
                 child: Column(
                   children: [
+                    // Search Bar
                     Container(
                       decoration: BoxDecoration(
                         boxShadow: [
@@ -170,6 +183,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
+
+                    // Filter Toggle Button Row
                     Row(
                       children: [
                         Expanded(
@@ -195,6 +210,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                       : (isDark
                                             ? Colors.white.withOpacity(0.05)
                                             : Colors.grey[200]!),
+                                  width: 1.5,
                                 ),
                               ),
                               child: Row(
@@ -222,8 +238,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        if (provider.isFilterActive)
+                        if (provider.isFilterActive) ...[
+                          const SizedBox(width: 12),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppConstants.errorColor
@@ -244,12 +260,24 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                             },
                             child: const Text('Clear'),
                           ),
+                        ],
                       ],
                     ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
-              if (_showFilters) _buildFilters(context, provider),
+
+              // 🛠️ UX FIX: Animated Size makes the filters slide down beautifully!
+              AnimatedSize(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOutCubic,
+                alignment: Alignment.topCenter,
+                child: _showFilters
+                    ? _buildFilters(context, provider)
+                    : const SizedBox(width: double.infinity),
+              ),
+
               Expanded(
                 child: provider.transactions.isEmpty
                     ? EmptyState(
@@ -270,15 +298,43 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               }
                             : () => _navigateToAddTransaction(context),
                       )
+                    // 🛠️ UX FIX: Rendering the Smart Date Grouped List
                     : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
-                        itemCount: provider.transactions.length,
+                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+                        physics:
+                            const BouncingScrollPhysics(), // Premium scroll feel
+                        itemCount: groupedItems.length,
                         itemBuilder: (context, index) {
-                          final transaction = provider.transactions[index];
+                          final item = groupedItems[index];
+
+                          // If the item is a String, it's a Date Header
+                          if (item is String) {
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                top: 16,
+                                bottom: 8,
+                                left: 4,
+                              ),
+                              child: Text(
+                                item,
+                                style: Theme.of(context).textTheme.titleSmall
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.grey[500],
+                                      letterSpacing: 0.5,
+                                    ),
+                              ),
+                            );
+                          }
+
+                          // Otherwise, it's a Transaction
+                          final transaction = item as Transaction;
                           return AnimatedTransactionListItem(
                             title: getCategoryLabel(transaction.category),
                             amount:
                                 '${transaction.type == TransactionType.income ? '+' : '-'} ${NumberUtils.formatCurrency(transaction.amount)}',
+                            // We can hide the date here since it's in the header, OR keep the specific time if you format it that way.
+                            // We will keep your original Date string for consistency, or you can use `DateUtils.formatTime(transaction.date)` to just show the time!
                             date: DateUtils.formatDateTimeCompact(
                               transaction.date,
                             ),
@@ -290,7 +346,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                               context,
                               transaction,
                             ),
-                            // 🛠️ ADDED: Now swiping right triggers the edit screen
                             onEdit: () => _navigateToEditTransaction(
                               context,
                               transaction,
@@ -315,7 +370,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     final relevantCategories = _getRelevantCategories(provider.selectedType);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -329,6 +384,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           const SizedBox(height: 12),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
             child: Row(
               children: [
                 _buildFilterChip(
@@ -373,6 +429,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           const SizedBox(height: 12),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
             child: Row(
               children: [
                 _buildFilterChip(
