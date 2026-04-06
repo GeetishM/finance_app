@@ -70,10 +70,14 @@ class DateUtils {
 
 class NumberUtils {
   static String formatCurrency(double amount) {
+    // 🛠️ UX FIX: Only show decimals if there are actual cents. 
+    // This saves tons of space! (e.g. ₹20,000.00 -> ₹20,000)
+    bool hasDecimals = amount.truncateToDouble() != amount;
+
     final formatter = NumberFormat.simpleCurrency(
       locale: 'en_IN',
       name: '₹',
-      decimalDigits: 2,
+      decimalDigits: hasDecimals ? 2 : 0, 
     );
     return formatter.format(amount);
   }
