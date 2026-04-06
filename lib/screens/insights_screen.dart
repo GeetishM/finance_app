@@ -26,9 +26,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
       appBar: AppBar(
         title: Text(
           'Insights',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
         ),
         elevation: 0,
       ),
@@ -142,7 +142,7 @@ class _InsightsScreenState extends State<InsightsScreen> {
                             color: Colors.black.withOpacity(0.05),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
-                          )
+                          ),
                         ]
                       : [],
                 ),
@@ -174,8 +174,8 @@ class _InsightsScreenState extends State<InsightsScreen> {
     final transactions = _selectedPeriod == 'Weekly'
         ? weekTransactions
         : _selectedPeriod == 'Monthly'
-            ? monthTransactions
-            : provider.allTransactions;
+        ? monthTransactions
+        : provider.allTransactions;
 
     final income = transactions
         .where((t) => t.type == TransactionType.income)
@@ -192,9 +192,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
       children: [
         Text(
           '$_selectedPeriod Overview',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 16),
         Row(
@@ -222,25 +222,26 @@ class _InsightsScreenState extends State<InsightsScreen> {
         SummaryCard(
           label: 'Net Savings',
           amount: NumberUtils.formatCurrency(savings),
-          color: savings >= 0 ? AppConstants.primaryColor : AppConstants.errorColor,
-          icon: savings >= 0 ? Icons.account_balance_wallet_rounded : Icons.money_off_rounded,
+          color: savings >= 0
+              ? AppConstants.primaryColor
+              : AppConstants.errorColor,
+          icon: savings >= 0
+              ? Icons.account_balance_wallet_rounded
+              : Icons.money_off_rounded,
         ),
       ],
     );
   }
 
-  Widget _buildTrendChart(
-    BuildContext context,
-    TransactionProvider provider,
-  ) {
+  Widget _buildTrendChart(BuildContext context, TransactionProvider provider) {
     final weekTransactions = provider.getWeeklyTransactions();
     final monthTransactions = provider.getMonthlyTransactions();
 
     final transactions = _selectedPeriod == 'Weekly'
         ? weekTransactions
         : _selectedPeriod == 'Monthly'
-            ? monthTransactions
-            : provider.allTransactions;
+        ? monthTransactions
+        : provider.allTransactions;
 
     // Group by date
     final dateMap = <String, double>{};
@@ -272,9 +273,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
           child: Text(
             'No expense data for this period',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Colors.grey[500],
-                  fontWeight: FontWeight.w600,
-                ),
+              color: Colors.grey[500],
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       );
@@ -303,9 +304,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
         children: [
           Text(
             'Daily Expense Trend',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 32),
           SizedBox(
@@ -320,21 +321,30 @@ class _InsightsScreenState extends State<InsightsScreen> {
                       BarChartRodData(
                         toY: sortedDates[index].value,
                         color: AppConstants.primaryColor,
-                        width: 12, // 🛠️ UX FIX: Thicker, rounder bars!
-                        borderRadius: BorderRadius.circular(12),
+                        width: 14, // 🛠️ Made the bars much thicker
+                        borderRadius: BorderRadius.circular(
+                          12,
+                        ), // 🛠️ Fully rounded "bubble" tips
                       ),
                     ],
                   ),
                 ),
                 borderData: FlBorderData(show: false),
+                // 🛠️ Turned on horizontal grid lines so users can read the chart!
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
                   horizontalInterval: _calculateInterval(sortedDates),
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100],
-                      strokeWidth: 1,
+                      color: isDark
+                          ? Colors.white.withOpacity(0.05)
+                          : Colors.grey[200],
+                      strokeWidth: 1.5,
+                      dashArray: [
+                        4,
+                        4,
+                      ], // Adds a nice dashed effect to the grid
                     );
                   },
                 ),
@@ -345,15 +355,18 @@ class _InsightsScreenState extends State<InsightsScreen> {
                       getTitlesWidget: (value, meta) {
                         final index = value.toInt();
                         if (index >= 0 && index < sortedDates.length) {
-                          // Display just the day number to keep it clean (e.g. "12" instead of "Apr 12")
-                          String dayStr = sortedDates[index].key.split(' ').last;
+                          // Display just the day number (e.g. "12" instead of "Apr 12") for a cleaner X-axis
+                          String dayStr = sortedDates[index].key
+                              .split(' ')
+                              .last;
                           return Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
                               dayStr,
-                              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              style: Theme.of(context).textTheme.labelSmall
+                                  ?.copyWith(
                                     color: Colors.grey[500],
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w700,
                                   ),
                             ),
                           );
@@ -362,9 +375,15 @@ class _InsightsScreenState extends State<InsightsScreen> {
                       },
                     ),
                   ),
-                  leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  leftTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                 ),
               ),
             ),
@@ -392,8 +411,8 @@ class _InsightsScreenState extends State<InsightsScreen> {
     final transactions = _selectedPeriod == 'Weekly'
         ? weekTransactions
         : _selectedPeriod == 'Monthly'
-            ? monthTransactions
-            : provider.allTransactions;
+        ? monthTransactions
+        : provider.allTransactions;
 
     final categoryMap = <TransactionCategory, double>{};
     for (var transaction in transactions) {
@@ -436,9 +455,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
         children: [
           Text(
             'Top Spending Categories',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 24),
           Column(
@@ -464,7 +483,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: getCategoryColor(category).withOpacity(0.15),
+                                color: getCategoryColor(
+                                  category,
+                                ).withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
@@ -476,15 +497,15 @@ class _InsightsScreenState extends State<InsightsScreen> {
                             const SizedBox(width: 12),
                             Text(
                               getCategoryLabel(category),
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                              style: Theme.of(context).textTheme.titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.w700),
                             ),
                           ],
                         ),
                         Text(
                           '${(percentage * 100).toStringAsFixed(0)}%',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
                                 fontWeight: FontWeight.w800,
                                 color: getCategoryColor(category),
                               ),
@@ -497,7 +518,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
                       child: LinearProgressIndicator(
                         value: percentage,
                         minHeight: 8, // 🛠️ UX FIX: Thicker progress bars
-                        backgroundColor: isDark ? const Color(0xFF334155) : Colors.grey[100],
+                        backgroundColor: isDark
+                            ? const Color(0xFF334155)
+                            : Colors.grey[100],
                         valueColor: AlwaysStoppedAnimation<Color>(
                           getCategoryColor(category),
                         ),
@@ -507,9 +530,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
                     Text(
                       NumberUtils.formatCurrency(amount),
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: Colors.grey[500],
-                            fontWeight: FontWeight.w700,
-                          ),
+                        color: Colors.grey[500],
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),
@@ -531,8 +554,8 @@ class _InsightsScreenState extends State<InsightsScreen> {
     final transactions = _selectedPeriod == 'Weekly'
         ? weekTransactions
         : _selectedPeriod == 'Monthly'
-            ? monthTransactions
-            : provider.allTransactions;
+        ? monthTransactions
+        : provider.allTransactions;
 
     final categoryMap = <TransactionCategory, double>{};
     for (var transaction in transactions) {
@@ -574,9 +597,9 @@ class _InsightsScreenState extends State<InsightsScreen> {
         children: [
           Text(
             'All Categories',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 20),
           Column(
@@ -606,17 +629,16 @@ class _InsightsScreenState extends State<InsightsScreen> {
                         const SizedBox(width: 12),
                         Text(
                           getCategoryLabel(category),
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
                     Text(
                       NumberUtils.formatCurrency(amount),
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ],
                 ),

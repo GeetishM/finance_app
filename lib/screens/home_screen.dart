@@ -1,11 +1,12 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:finance_app/models/transaction.dart';
 import 'package:finance_app/providers/goal_provider.dart';
 import 'package:finance_app/providers/theme_provider.dart';
 import 'package:finance_app/providers/transaction_provider.dart';
 import 'package:finance_app/screens/transactions_screen.dart';
 import 'package:finance_app/screens/add_transaction_screen.dart';
-import 'package:finance_app/screens/add_goal_screen.dart';
-import 'package:finance_app/screens/goals_screen.dart'; // 🛠️ ADDED: Import GoalsScreen
+import 'package:finance_app/screens/goals_screen.dart'; 
 import 'package:finance_app/utils/animations.dart';
 import 'package:finance_app/utils/constants.dart';
 import 'package:finance_app/utils/helpers.dart';
@@ -16,7 +17,7 @@ import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -421,6 +422,8 @@ class _HomeScreenState extends State<HomeScreen>
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
+                          // ignore: duplicate_ignore
+                          // ignore: deprecated_member_use
                           color: AppConstants.primaryColor.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),

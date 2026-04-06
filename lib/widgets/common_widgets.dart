@@ -1,7 +1,9 @@
 import 'package:finance_app/utils/constants.dart';
 import 'package:flutter/material.dart';
 
-// Summary Card Widget - Upgraded for Scaling Text
+// ---------------------------------------------------------
+// 1. SUMMARY CARD (Fixed Text Wrapping)
+// ---------------------------------------------------------
 class SummaryCard extends StatelessWidget {
   final String label;
   final String amount;
@@ -20,31 +22,39 @@ class SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        // Slightly reduced horizontal padding to give text more breathing room
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+            width: 1.5,
           ),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.2), width: 1),
+          boxShadow: [
+            if (!isDark)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+          ],
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10), // Slimmer icon box
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(16),
               ),
-              child: Icon(icon, color: color, size: 22),
+              child: Icon(icon, color: color, size: 24),
             ),
-            const SizedBox(width: 10), // Slimmer gap
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,22 +64,23 @@ class SummaryCard extends StatelessWidget {
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: Colors.grey[500],
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
                   ),
                   const SizedBox(height: 4),
-                  // 🛠️ UX FIX: Fitted box guarantees it NEVER wraps to a second line
+                  // 🛠️ FIX #1: FittedBox dynamically shrinks text so it never wraps!
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
                     child: Text(
                       amount,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
+                            fontWeight: FontWeight.w800,
+                            color: isDark ? Colors.white : const Color(0xFF111827),
+                          ),
                     ),
                   ),
                 ],
@@ -82,7 +93,9 @@ class SummaryCard extends StatelessWidget {
   }
 }
 
-// Transaction List Item Widget
+// ---------------------------------------------------------
+// 2. TRANSACTION LIST ITEM (Legacy - keeping for safety)
+// ---------------------------------------------------------
 class TransactionListItem extends StatelessWidget {
   final String title;
   final String amount;
@@ -126,7 +139,7 @@ class TransactionListItem extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(
             color: isDark ? const Color(0xFF1E293B) : Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isDark ? Colors.grey[700]! : Colors.grey[200]!,
               width: 1,
@@ -138,7 +151,7 @@ class TransactionListItem extends StatelessWidget {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: categoryColor.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(categoryIcon, color: categoryColor, size: 20),
               ),
@@ -150,16 +163,16 @@ class TransactionListItem extends StatelessWidget {
                     Text(
                       title,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                            fontWeight: FontWeight.w600,
+                          ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       date,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: Colors.grey[500]),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.grey[500],
+                          ),
                     ),
                   ],
                 ),
@@ -167,9 +180,9 @@ class TransactionListItem extends StatelessWidget {
               Text(
                 amount,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: categoryColor,
-                ),
+                      fontWeight: FontWeight.bold,
+                      color: categoryColor,
+                    ),
               ),
             ],
           ),
@@ -179,8 +192,9 @@ class TransactionListItem extends StatelessWidget {
   }
 }
 
-
-// Progress Indicator Widget
+// ---------------------------------------------------------
+// 3. GOAL PROGRESS CARD (Fixed Margins)
+// ---------------------------------------------------------
 class GoalProgressCard extends StatelessWidget {
   final String goalTitle;
   final double progressPercentage;
@@ -206,7 +220,8 @@ class GoalProgressCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(24), // 🛠️ FIX: Increased from 16 to 24 to match the new wide margins
+        // 🛠️ FIX #2: Increased padding to 24 to match chart and screen margins perfectly
+        padding: const EdgeInsets.all(24), 
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: BorderRadius.circular(24),
@@ -215,11 +230,12 @@ class GoalProgressCard extends StatelessWidget {
             width: 1.5,
           ),
           boxShadow: [
-            BoxShadow(
-              color: primaryColor.withOpacity(0.05),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
+            if (!isDark)
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
           ],
         ),
         child: Column(
@@ -256,7 +272,7 @@ class GoalProgressCard extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ClipRRect(
-              borderRadius: BorderRadius.circular(12), // Pill shaped
+              borderRadius: BorderRadius.circular(12),
               child: LinearProgressIndicator(
                 value: progressPercentage.clamp(0.0, 1.0),
                 minHeight: 10,
@@ -291,7 +307,9 @@ class GoalProgressCard extends StatelessWidget {
   }
 }
 
-// Empty State Widget
+// ---------------------------------------------------------
+// 4. EMPTY STATE WIDGET (Fixed Button Padding)
+// ---------------------------------------------------------
 class EmptyState extends StatelessWidget {
   final String title;
   final String message;
@@ -317,42 +335,53 @@ class EmptyState extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 64, color: Colors.grey[400]),
-              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: AppConstants.primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: 64,
+                  color: AppConstants.primaryColor,
+                ),
+              ),
+              const SizedBox(height: 24),
               Text(
                 title,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
                 message,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey[500],
+                      height: 1.5,
+                    ),
                 textAlign: TextAlign.center,
               ),
               if (onAction != null && actionLabel != null) ...[
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: onAction,
+                  // 🛠️ FIX #3: Added horizontal padding so the text isn't squished!
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppConstants.primaryColor,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
+                    elevation: 0,
                   ),
                   child: Text(
                     actionLabel!,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 16, 
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -366,7 +395,9 @@ class EmptyState extends StatelessWidget {
   }
 }
 
-// Loading Widget
+// ---------------------------------------------------------
+// 5. LOADING WIDGET
+// ---------------------------------------------------------
 class LoadingWidget extends StatelessWidget {
   final String? message;
 
@@ -378,10 +409,19 @@ class LoadingWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircularProgressIndicator(color: AppConstants.primaryColor),
+          const CircularProgressIndicator(
+            color: AppConstants.primaryColor,
+            strokeWidth: 3,
+          ),
           if (message != null) ...[
             const SizedBox(height: 16),
-            Text(message!, style: Theme.of(context).textTheme.bodyMedium),
+            Text(
+              message!,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[500],
+              ),
+            ),
           ],
         ],
       ),

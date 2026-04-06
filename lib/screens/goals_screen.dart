@@ -37,18 +37,23 @@ class _GoalsScreenState extends State<GoalsScreen>
       appBar: AppBar(
         title: Text(
           'Savings Goals',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
         ),
         elevation: 0,
         bottom: TabBar(
           controller: _tabController,
-          labelStyle: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-          unselectedLabelStyle: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+          labelStyle: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          unselectedLabelStyle: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
           indicatorColor: AppConstants.primaryColor,
           indicatorWeight: 3,
-          dividerColor: Colors.transparent, // Clean up the harsh line under tabs
+          dividerColor:
+              Colors.transparent, // Clean up the harsh line under tabs
           tabs: const [
             Tab(text: 'Active'),
             Tab(text: 'Completed'),
@@ -64,7 +69,8 @@ class _GoalsScreenState extends State<GoalsScreen>
               provider.activeGoals.isEmpty
                   ? EmptyState(
                       title: 'No Active Goals',
-                      message: 'Create a savings goal to start tracking your progress',
+                      message:
+                          'Create a savings goal to start tracking your progress',
                       icon: Icons.flag_rounded,
                       actionLabel: 'Add Goal',
                       onAction: () => _navigateToAddGoal(context),
@@ -94,7 +100,11 @@ class _GoalsScreenState extends State<GoalsScreen>
                         final goal = provider.completedGoals[index];
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 16),
-                          child: _buildCompletedGoalCard(context, goal, provider),
+                          child: _buildCompletedGoalCard(
+                            context,
+                            goal,
+                            provider,
+                          ),
                         );
                       },
                     ),
@@ -115,7 +125,9 @@ class _GoalsScreenState extends State<GoalsScreen>
   ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final onTrack = goal.isOnTrack;
-    final primaryColor = onTrack ? AppConstants.successColor : AppConstants.warningColor;
+    final primaryColor = onTrack
+        ? AppConstants.successColor
+        : AppConstants.warningColor;
 
     return GestureDetector(
       onTap: () => _navigateToEditGoal(context, goal),
@@ -150,8 +162,8 @@ class _GoalsScreenState extends State<GoalsScreen>
                       Text(
                         goal.title,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            ),
+                          fontWeight: FontWeight.w800,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -177,11 +189,16 @@ class _GoalsScreenState extends State<GoalsScreen>
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey[500]),
+                          Icon(
+                            Icons.calendar_today_rounded,
+                            size: 14,
+                            color: Colors.grey[500],
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             DateUtils.formatDate(goal.deadline),
-                            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
                                   color: Colors.grey[500],
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -191,7 +208,7 @@ class _GoalsScreenState extends State<GoalsScreen>
                     ],
                   ),
                 ),
-                // 🛠️ UX/UI FIX: Beautiful, themed popup menu with icons!
+                // 🛠️ FIX #4: Custom Themed Popup Menu with Icons
                 Theme(
                   data: Theme.of(context).copyWith(
                     popupMenuTheme: PopupMenuThemeData(
@@ -203,50 +220,98 @@ class _GoalsScreenState extends State<GoalsScreen>
                     ),
                   ),
                   child: PopupMenuButton(
-                    icon: Icon(Icons.more_vert_rounded, color: Colors.grey[400]),
-                    offset: const Offset(0, 40),
+                    icon: Icon(
+                      Icons.more_vert_rounded,
+                      color: Colors.grey[400],
+                    ),
+                    offset: const Offset(
+                      0,
+                      40,
+                    ), // Pushes the menu slightly down
                     itemBuilder: (context) => [
                       PopupMenuItem(
                         child: Row(
                           children: [
-                            Icon(Icons.edit_rounded, size: 20, color: AppConstants.primaryColor),
+                            const Icon(
+                              Icons.edit_rounded,
+                              size: 20,
+                              color: AppConstants.primaryColor,
+                            ),
                             const SizedBox(width: 12),
-                            const Text('Edit Goal', style: TextStyle(fontWeight: FontWeight.w600)),
+                            const Text(
+                              'Edit Goal',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
                           ],
                         ),
-                        // Note: Future.delayed is used so the popup can fully close before navigating/showing a dialog
-                        onTap: () => Future.delayed(Duration.zero, () => _navigateToEditGoal(context, goal)),
+                        onTap: () => Future.delayed(
+                          Duration.zero,
+                          () => _navigateToEditGoal(context, goal),
+                        ),
                       ),
                       PopupMenuItem(
                         child: Row(
                           children: [
-                            Icon(Icons.add_circle_outline_rounded, size: 20, color: AppConstants.successColor),
+                            const Icon(
+                              Icons.add_circle_outline_rounded,
+                              size: 20,
+                              color: AppConstants.successColor,
+                            ),
                             const SizedBox(width: 12),
-                            const Text('Add Progress', style: TextStyle(fontWeight: FontWeight.w600)),
+                            const Text(
+                              'Add Progress',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
                           ],
                         ),
-                        onTap: () => Future.delayed(Duration.zero, () => _showAddProgressDialog(context, goal, provider)),
+                        onTap: () => Future.delayed(
+                          Duration.zero,
+                          () => _showAddProgressDialog(context, goal, provider),
+                        ),
                       ),
                       if (goal.currentAmount >= goal.targetAmount)
                         PopupMenuItem(
                           child: Row(
                             children: [
-                              Icon(Icons.emoji_events_rounded, size: 20, color: AppConstants.warningColor),
+                              const Icon(
+                                Icons.emoji_events_rounded,
+                                size: 20,
+                                color: AppConstants.warningColor,
+                              ),
                               const SizedBox(width: 12),
-                              const Text('Mark Complete', style: TextStyle(fontWeight: FontWeight.w600)),
+                              const Text(
+                                'Mark Complete',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
                             ],
                           ),
-                          onTap: () => Future.delayed(Duration.zero, () => _completeGoal(context, goal, provider)),
+                          onTap: () => Future.delayed(
+                            Duration.zero,
+                            () => _completeGoal(context, goal, provider),
+                          ),
                         ),
                       PopupMenuItem(
                         child: Row(
                           children: [
-                            Icon(Icons.delete_outline_rounded, size: 20, color: AppConstants.errorColor),
+                            const Icon(
+                              Icons.delete_outline_rounded,
+                              size: 20,
+                              color: AppConstants.errorColor,
+                            ),
                             const SizedBox(width: 12),
-                            const Text('Delete', style: TextStyle(fontWeight: FontWeight.w600, color: AppConstants.errorColor)),
+                            const Text(
+                              'Delete',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: AppConstants.errorColor,
+                              ),
+                            ),
                           ],
                         ),
-                        onTap: () => Future.delayed(Duration.zero, () => _deleteGoal(context, goal.id, provider)),
+                        onTap: () => Future.delayed(
+                          Duration.zero,
+                          () => _deleteGoal(context, goal.id, provider),
+                        ),
                       ),
                     ],
                   ),
@@ -254,7 +319,7 @@ class _GoalsScreenState extends State<GoalsScreen>
               ],
             ),
             const SizedBox(height: 24),
-            
+
             // Progress Bar
             Row(
               children: [
@@ -264,7 +329,9 @@ class _GoalsScreenState extends State<GoalsScreen>
                     child: LinearProgressIndicator(
                       value: goal.progressPercentage.clamp(0.0, 1.0),
                       minHeight: 12,
-                      backgroundColor: isDark ? const Color(0xFF334155) : Colors.grey[200],
+                      backgroundColor: isDark
+                          ? const Color(0xFF334155)
+                          : Colors.grey[200],
                       valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
                     ),
                   ),
@@ -273,14 +340,14 @@ class _GoalsScreenState extends State<GoalsScreen>
                 Text(
                   '${(goal.progressPercentage * 100).toStringAsFixed(0)}%',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: primaryColor,
-                      ),
+                    fontWeight: FontWeight.w800,
+                    color: primaryColor,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Amount Info
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -288,16 +355,16 @@ class _GoalsScreenState extends State<GoalsScreen>
                 Text(
                   NumberUtils.formatCurrency(goal.currentAmount),
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: primaryColor,
-                      ),
+                    fontWeight: FontWeight.w800,
+                    color: primaryColor,
+                  ),
                 ),
                 Text(
                   NumberUtils.formatCurrency(goal.targetAmount),
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Colors.grey[500],
-                        fontWeight: FontWeight.w700,
-                      ),
+                    color: Colors.grey[500],
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
             ),
@@ -352,12 +419,8 @@ class _GoalsScreenState extends State<GoalsScreen>
                         Expanded(
                           child: Text(
                             goal.title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                ),
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(fontWeight: FontWeight.w800),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -367,11 +430,16 @@ class _GoalsScreenState extends State<GoalsScreen>
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        Icon(Icons.check_circle_outline_rounded, size: 16, color: Colors.grey[500]),
+                        Icon(
+                          Icons.check_circle_outline_rounded,
+                          size: 16,
+                          color: Colors.grey[500],
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           'Completed: ${DateUtils.formatDate(goal.deadline)}',
-                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
                                 color: Colors.grey[500],
                                 fontWeight: FontWeight.w600,
                               ),
@@ -382,7 +450,10 @@ class _GoalsScreenState extends State<GoalsScreen>
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.delete_outline_rounded, color: AppConstants.errorColor),
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: AppConstants.errorColor,
+                ),
                 onPressed: () => _deleteGoal(context, goal.id, provider),
               ),
             ],
@@ -391,9 +462,9 @@ class _GoalsScreenState extends State<GoalsScreen>
           Text(
             NumberUtils.formatCurrency(goal.targetAmount),
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: AppConstants.successColor,
-                ),
+              fontWeight: FontWeight.w800,
+              color: AppConstants.successColor,
+            ),
           ),
         ],
       ),
@@ -403,18 +474,14 @@ class _GoalsScreenState extends State<GoalsScreen>
   void _navigateToAddGoal(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const AddGoalScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const AddGoalScreen()),
     );
   }
 
   void _navigateToEditGoal(BuildContext context, SavingsGoal goal) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => AddGoalScreen(goal: goal),
-      ),
+      MaterialPageRoute(builder: (context) => AddGoalScreen(goal: goal)),
     );
   }
 
@@ -434,7 +501,9 @@ class _GoalsScreenState extends State<GoalsScreen>
         backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
         title: Text(
           'Add to Savings',
-          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -442,28 +511,37 @@ class _GoalsScreenState extends State<GoalsScreen>
           children: [
             Text(
               'Current total: ${NumberUtils.formatCurrency(goal.currentAmount)}',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[500], fontWeight: FontWeight.w600),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.grey[500],
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: controller,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               autofocus: true,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800, 
+                fontWeight: FontWeight.w800,
                 color: AppConstants.successColor,
               ),
               decoration: InputDecoration(
                 hintText: '0.00',
                 hintStyle: TextStyle(color: Colors.grey[400]),
                 prefixText: '+ ₹ ',
-                prefixStyle: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: AppConstants.successColor,
-                  fontWeight: FontWeight.w800,
-                ),
+                prefixStyle: Theme.of(context).textTheme.headlineSmall
+                    ?.copyWith(
+                      color: AppConstants.successColor,
+                      fontWeight: FontWeight.w800,
+                    ),
                 filled: true,
                 fillColor: isDark ? const Color(0xFF0F172A) : Colors.grey[100],
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
           ],
@@ -472,13 +550,21 @@ class _GoalsScreenState extends State<GoalsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w700)),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppConstants.primaryColor,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             onPressed: () {
               final amountToAdd = double.tryParse(controller.text);
@@ -487,7 +573,7 @@ class _GoalsScreenState extends State<GoalsScreen>
                 final newTotal = goal.currentAmount + amountToAdd;
                 provider.updateGoalProgress(goal.id, newTotal);
                 Navigator.pop(context);
-                
+
                 ScaffoldMessenger.of(context).clearSnackBars();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -497,12 +583,20 @@ class _GoalsScreenState extends State<GoalsScreen>
                     ),
                     backgroundColor: AppConstants.successColor,
                     behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 );
               }
             },
-            child: const Text('Save', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+            child: const Text(
+              'Save',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
         ],
       ),
@@ -518,38 +612,53 @@ class _GoalsScreenState extends State<GoalsScreen>
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Goal completed! 🎉', style: TextStyle(fontWeight: FontWeight.w600)),
+        content: const Text(
+          'Goal completed! 🎉',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
         backgroundColor: AppConstants.successColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      )
+      ),
     );
   }
 
-  void _deleteGoal(
-    BuildContext context,
-    String goalId,
-    GoalProvider provider,
-  ) {
+  void _deleteGoal(BuildContext context, String goalId, GoalProvider provider) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-        title: Text('Delete Goal', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)),
-        content: const Text('Are you sure you want to delete this goal? All progress will be lost.', style: TextStyle(height: 1.5)),
+        title: Text(
+          'Delete Goal',
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        content: const Text(
+          'Are you sure you want to delete this goal? All progress will be lost.',
+          style: TextStyle(height: 1.5),
+        ),
         actionsPadding: const EdgeInsets.all(20),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w700)),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: AppConstants.errorColor,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             onPressed: () {
               provider.deleteGoal(goalId);
@@ -557,7 +666,10 @@ class _GoalsScreenState extends State<GoalsScreen>
             },
             child: const Text(
               'Delete',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
