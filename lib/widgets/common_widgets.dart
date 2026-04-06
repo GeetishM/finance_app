@@ -1,8 +1,7 @@
 import 'package:finance_app/utils/constants.dart';
 import 'package:flutter/material.dart';
 
-
-// Summary Card Widget
+// Summary Card Widget - Upgraded to Glassmorphism
 class SummaryCard extends StatelessWidget {
   final String label;
   final String amount;
@@ -21,29 +20,34 @@ class SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: color.withOpacity(0.2),
-            width: 1,
+            color: isDark ? Colors.white.withOpacity(0.05) : color.withOpacity(0.1),
+            width: 1.5,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(isDark ? 0.1 : 0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(12),
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(icon, color: color, size: 24),
             ),
@@ -55,17 +59,18 @@ class SummaryCard extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[600],
-                          fontWeight: FontWeight.w500,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: Colors.grey[500],
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
                         ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     amount,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: color,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: isDark ? Colors.white : const Color(0xFF111827),
                         ),
                   ),
                 ],
@@ -78,7 +83,7 @@ class SummaryCard extends StatelessWidget {
   }
 }
 
-// Transaction List Item Widget
+// Transaction List Item Widget - Upgraded
 class TransactionListItem extends StatelessWidget {
   final String title;
   final String amount;
@@ -108,56 +113,61 @@ class TransactionListItem extends StatelessWidget {
       onDismissed: (_) => onDelete?.call(),
       background: Container(
         decoration: BoxDecoration(
-          color: Colors.red,
-          borderRadius: BorderRadius.circular(12),
+          color: AppConstants.errorColor,
+          borderRadius: BorderRadius.circular(20),
         ),
         alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 16),
-        child: const Icon(Icons.delete, color: Colors.white),
+        padding: const EdgeInsets.only(right: 20),
+        child: const Icon(Icons.delete_outline, color: Colors.white, size: 28),
       ),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: isDark
-                ? const Color(0xFF1E293B)
-                : Colors.white,
-            borderRadius: BorderRadius.circular(12),
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isDark
-                  ? Colors.grey[700]!
-                  : Colors.grey[200]!,
-              width: 1,
+              color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[100]!,
+              width: 1.5,
             ),
+            boxShadow: [
+              if (!isDark)
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+            ],
           ),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: categoryColor.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(10),
+                  color: categoryColor.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(categoryIcon, color: categoryColor, size: 20),
+                child: Icon(categoryIcon, color: categoryColor, size: 22),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
                           ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 4),
                     Text(
                       date,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
                             color: Colors.grey[500],
                           ),
                     ),
@@ -166,9 +176,11 @@ class TransactionListItem extends StatelessWidget {
               ),
               Text(
                 amount,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: categoryColor,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: amount.startsWith('+') 
+                          ? AppConstants.successColor 
+                          : (isDark ? Colors.white : const Color(0xFF111827)),
                     ),
               ),
             ],
@@ -179,7 +191,7 @@ class TransactionListItem extends StatelessWidget {
   }
 }
 
-// Progress Indicator Widget
+// Progress Indicator Widget - Upgraded
 class GoalProgressCard extends StatelessWidget {
   final String goalTitle;
   final double progressPercentage;
@@ -205,18 +217,21 @@ class GoalProgressCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isDark
-              ? const Color(0xFF1E293B)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isDark
-                ? Colors.grey[700]!
-                : Colors.grey[200]!,
-            width: 1,
+            color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey[200]!,
+            width: 1.5,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: primaryColor.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,55 +242,55 @@ class GoalProgressCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     goalTitle,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
                         ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8),
+                    color: primaryColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${(progressPercentage * 100).toStringAsFixed(0)}%',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
                           color: primaryColor,
                         ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
             ClipRRect(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(12), // Pill shaped
               child: LinearProgressIndicator(
                 value: progressPercentage.clamp(0.0, 1.0),
-                minHeight: 8,
-                backgroundColor: Colors.grey[300],
+                minHeight: 10,
+                backgroundColor: isDark ? const Color(0xFF334155) : Colors.grey[200],
                 valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   currentAmount,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Colors.grey[500],
+                        fontWeight: FontWeight.w600,
                       ),
                 ),
                 Text(
                   targetAmount,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w600,
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: isDark ? Colors.white : const Color(0xFF111827),
+                        fontWeight: FontWeight.w800,
                       ),
                 ),
               ],
@@ -287,7 +302,7 @@ class GoalProgressCard extends StatelessWidget {
   }
 }
 
-// Empty State Widget
+// Empty State Widget - Button Padding Fixed
 class EmptyState extends StatelessWidget {
   final String title;
   final String message;
@@ -312,31 +327,42 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 64,
-              color: Colors.grey[400],
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppConstants.primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 64,
+                color: AppConstants.primaryColor.withOpacity(0.7),
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             Text(
               title,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w800,
                   ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Text(
               message,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[600],
+                    color: Colors.grey[500],
+                    height: 1.5,
                   ),
               textAlign: TextAlign.center,
             ),
             if (onAction != null && actionLabel != null) ...[
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: onAction,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16), // Proper padding
+                ),
                 child: Text(actionLabel!),
               ),
             ],
@@ -347,10 +373,8 @@ class EmptyState extends StatelessWidget {
   }
 }
 
-// Loading Widget
 class LoadingWidget extends StatelessWidget {
   final String? message;
-
   const LoadingWidget({Key? key, this.message}) : super(key: key);
 
   @override
@@ -361,12 +385,16 @@ class LoadingWidget extends StatelessWidget {
         children: [
           const CircularProgressIndicator(
             color: AppConstants.primaryColor,
+            strokeWidth: 3,
           ),
           if (message != null) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Text(
               message!,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: Colors.grey[500],
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ],

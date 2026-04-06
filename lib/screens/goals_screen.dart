@@ -3,6 +3,7 @@ import 'package:finance_app/providers/goal_provider.dart';
 import 'package:finance_app/screens/add_goal_screen.dart';
 import 'package:finance_app/utils/constants.dart';
 import 'package:finance_app/utils/helpers.dart';
+import 'package:finance_app/widgets/animated_fab.dart';
 import 'package:finance_app/widgets/common_widgets.dart';
 import 'package:flutter/material.dart' hide DateUtils;
 import 'package:provider/provider.dart';
@@ -98,9 +99,8 @@ class _GoalsScreenState extends State<GoalsScreen>
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: AnimatedFAB(
         onPressed: () => _navigateToAddGoal(context),
-        child: const Icon(Icons.add),
       ),
     );
   }

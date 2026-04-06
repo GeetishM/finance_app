@@ -1,9 +1,8 @@
 import 'package:finance_app/models/transaction.dart';
 import 'package:flutter/material.dart';
 
-
 class AppConstants {
-  // Category Icons
+  // Category Icons (Kept identical so logic doesn't break)
   static Map<TransactionCategory, IconData> categoryIcons = {
     TransactionCategory.food: Icons.restaurant,
     TransactionCategory.transport: Icons.directions_car,
@@ -18,23 +17,24 @@ class AppConstants {
     TransactionCategory.other: Icons.more_horiz,
   };
 
-  // Category Colors
+  // Upgraded Category Colors (Softer, modern tones)
   static Map<TransactionCategory, Color> categoryColors = {
-    TransactionCategory.food: const Color(0xFFEF4444),
-    TransactionCategory.transport: const Color(0xFFF97316),
-    TransactionCategory.entertainment: const Color(0xFF8B5CF6),
-    TransactionCategory.utilities: const Color(0xFFEAB308),
-    TransactionCategory.shopping: const Color(0xFFEC4899),
-    TransactionCategory.health: const Color(0xFF06B6D4),
-    TransactionCategory.education: const Color(0xFF3B82F6),
-    TransactionCategory.salary: const Color(0xFF10B981),
-    TransactionCategory.freelance: const Color(0xFF6366F1),
-    TransactionCategory.bonus: const Color(0xFFF59E0B),
-    TransactionCategory.other: const Color(0xFF6B7280),
+    TransactionCategory.food: const Color(0xFFFF6B6B), // Soft Red
+    TransactionCategory.transport: const Color(0xFF4D96FF), // Bright Blue
+    TransactionCategory.entertainment: const Color(0xFF9D4EDD), // Royal Purple
+    TransactionCategory.utilities: const Color(0xFFF4A261), // Soft Orange
+    TransactionCategory.shopping: const Color(0xFFFF99C8), // Soft Pink
+    TransactionCategory.health: const Color(0xFF06D6A0), // Mint Green
+    TransactionCategory.education: const Color(0xFF118AB2), // Ocean Blue
+    TransactionCategory.salary: const Color(0xFF00B4D8), // Cyan
+    TransactionCategory.freelance: const Color(0xFF6366F1), // Indigo
+    TransactionCategory.bonus: const Color(0xFFFFD166), // Warm Yellow
+    TransactionCategory.other: const Color(0xFF9CA3AF), // Cool Gray
   };
 
   // Category Labels
   static Map<TransactionCategory, String> categoryLabels = {
+    // ... Keep your existing category labels here ...
     TransactionCategory.food: 'Food',
     TransactionCategory.transport: 'Transport',
     TransactionCategory.entertainment: 'Entertainment',
@@ -48,41 +48,41 @@ class AppConstants {
     TransactionCategory.other: 'Other',
   };
 
-  // Transaction Type Labels
   static Map<TransactionType, String> typeLabels = {
     TransactionType.income: 'Income',
     TransactionType.expense: 'Expense',
   };
 
   // App Colors
-  static const Color primaryColor = Color(0xFF6366F1);
+  static const Color primaryColor = Color(0xFF4F46E5); 
   static const Color successColor = Color(0xFF10B981);
   static const Color errorColor = Color(0xFFEF4444);
   static const Color warningColor = Color(0xFFF59E0B);
 
-  static const Color lightBg = Color(0xFFF8F7FF);
-  static const Color darkBg = Color(0xFF0F172A);
-
-  // Gradient colors
+  // Fancier Gradients (Added a slight angle for a modern look)
   static const LinearGradient incomeGradient = LinearGradient(
-    colors: [Color(0xFF10B981), Color(0xFF059669)],
+    colors: [Color(0xFF059669), Color(0xFF34D399)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
+    transform: GradientRotation(0.5),
   );
 
   static const LinearGradient expenseGradient = LinearGradient(
-    colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+    colors: [Color(0xFFE11D48), Color(0xFFFB7185)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
+    transform: GradientRotation(0.5),
   );
 
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+    colors: [Color(0xFF4338CA), Color(0xFF6366F1), Color(0xFF818CF8)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
+    transform: GradientRotation(0.8), // Gives it a credit-card sheen
   );
 }
 
+// ... Keep your existing helper functions (getCategoryLabel, etc.) ...
 String getCategoryLabel(TransactionCategory category) {
   return AppConstants.categoryLabels[category] ?? 'Other';
 }

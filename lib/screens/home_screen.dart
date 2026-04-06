@@ -148,46 +148,63 @@ class _HomeScreenState extends State<HomeScreen>
       builder: (context, value, child) {
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(28), // Slightly more padding
           decoration: BoxDecoration(
             gradient: AppConstants.primaryGradient,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(32), // High roundness
             boxShadow: [
               BoxShadow(
-                color: AppConstants.primaryColor.withOpacity(0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                color: AppConstants.primaryColor.withOpacity(0.4),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
               ),
             ],
+            // Adding a subtle inner border for a glass-like effect
+            border: Border.all(
+              color: Colors.white.withOpacity(0.2),
+              width: 1.5,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Current Balance',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.9),
-                      fontWeight: FontWeight.w500,
-                    ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                NumberUtils.formatCurrency(value),
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 16),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Last updated: ${DateUtils.formatDateTimeCompact(DateTime.now())}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    'Total Balance',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: Colors.white.withOpacity(0.8),
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.5,
                         ),
                   ),
+                  Icon(Icons.account_balance_wallet, color: Colors.white.withOpacity(0.8)),
                 ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                NumberUtils.formatCurrency(value),
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -1, // Tight tracking for large numbers looks premium
+                    ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Updated ${DateUtils.formatDateTimeCompact(DateTime.now())}',
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
               ),
             ],
           ),
